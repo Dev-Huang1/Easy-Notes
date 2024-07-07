@@ -1,143 +1,27 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>便签应用</title>
-    <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        #note-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .note-item {
-            background-color: white;
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .add-button {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #0066FF;
-            color: white;
-            font-size: 30px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        #editor {
-            display: none;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        #editor-content {
-            width: 100%;
-            height: 200px;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .toolbar button {
-            margin-right: 5px;
-            padding: 5px 10px;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #save-button {
-            float: right;
-            background-color: #0066FF;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
+    <title>Notes App</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>便签应用</h1>
-        <ul id="note-list"></ul>
-        <button class="add-button" onclick="showEditor()">+</button>
+    <div id="notes-list">
+        <h1>Notes</h1>
+        <ul id="notes"></ul>
+        <button id="add-note-btn">+</button>
     </div>
-
-    <div id="editor">
-        <div class="toolbar">
-            <button onclick="formatText('bold')"><b>B</b></button>
-            <button onclick="formatText('italic')"><i>I</i></button>
-            <button onclick="formatText('underline')"><u>U</u></button>
+    <div id="note-editor" style="display: none;">
+        <textarea id="note-content"></textarea>
+        <div id="editor-toolbar">
+            <button onclick="document.execCommand('bold')"><b>B</b></button>
+            <button onclick="document.execCommand('italic')"><i>I</i></button>
+            <button onclick="document.execCommand('underline')"><u>U</u></button>
+            <input type="file" id="file-input" multiple>
         </div>
-        <div id="editor-content" contenteditable="true"></div>
-        <button id="save-button" onclick="saveNote()">保存</button>
+        <button id="save-note-btn">Save</button>
     </div>
-
-    <script>
-        let notes = JSON.parse(localStorage.getItem('notes')) || [];
-
-        function renderNotes() {
-            const noteList = document.getElementById('note-list');
-            noteList.innerHTML = '';
-            notes.forEach((note, index) => {
-                const li = document.createElement('li');
-                li.className = 'note-item';
-                li.innerHTML = note.content.substring(0, 100) + '...';
-                li.onclick = () => editNote(index);
-                noteList.appendChild(li);
-            });
-        }
-
-        function showEditor() {
-            document.getElementById('editor').style.display = 'block';
-            document.getElementById('editor-content').innerHTML = '';
-        }
-
-        function formatText(command) {
-            document.execCommand(command, false, null);
-        }
-
-        function saveNote() {
-            const content = document.getElementById('editor-content').innerHTML;
-            if (content.trim()) {
-                notes.push({ content, date: new Date() });
-                localStorage.setItem('notes', JSON.stringify(notes));
-                document.getElementById('editor').style.display = 'none';
-                renderNotes();
-            }
-        }
-
-        function editNote(index) {
-            const note = notes[index];
-            document.getElementById('editor-content').innerHTML = note.content;
-            document.getElementById('editor').style.display = 'block';
-            // 这里应该添加更新现有便签的逻辑
-        }
-
-        renderNotes();
-    </script>
+    <script src="/js/script.js"></script>
 </body>
 </html>
