@@ -1,92 +1,73 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background-color: #f0f0f0;
 }
 
-.container {
-    background-color: #fff;
+#notes-list {
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    width: 90%;
-    max-width: 600px;
-    position: relative;
 }
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
+#notes-list h1 {
     text-align: center;
 }
 
-#notes-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+#notes-list ul {
+    list-style-type: none;
+    padding: 0;
 }
 
-.note {
-    background-color: #fff;
+#notes-list li {
+    background: white;
+    margin: 10px 0;
     padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: calc(50% - 10px);
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
 }
 
 #add-note-btn {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #ffcc00;
-    color: #fff;
+    background-color: #0066ff;
+    color: white;
     border: none;
     border-radius: 50%;
     width: 50px;
     height: 50px;
-    font-size: 24px;
+    font-size: 30px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.write-container {
-    background-color: #fff;
+#note-editor {
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    width: 90%;
-    max-width: 600px;
-    margin: 0 auto;
 }
 
 #note-content {
     width: 100%;
-    height: 200px;
+    height: 300px;
     padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    margin-bottom: 10px;
 }
 
-#note-attachment {
-    margin-bottom: 10px;
+#editor-toolbar {
+    margin-top: 10px;
+}
+
+#editor-toolbar button {
+    padding: 5px;
+    margin-right: 5px;
+}
+
+#editor-toolbar input[type="file"] {
+    display: none;
 }
 
 #save-note-btn {
-    background-color: #007bff;
-    color: #fff;
+    display: block;
+    margin: 20px auto;
+    background-color: #0066ff;
+    color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 4px;
     cursor: pointer;
 }
