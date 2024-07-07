@@ -51,7 +51,7 @@
         }
 
         #note-content {
-            width: 100%;
+            width: 90%;
             height: 300px;
             padding: 10px;
         }
@@ -151,9 +151,6 @@
     <div id="note-editor" style="display: none;">
         <textarea id="note-content"></textarea>
         <div id="editor-toolbar">
-            <button onclick="document.execCommand('bold')"><b>B</b></button>
-            <button onclick="document.execCommand('italic')"><i>I</i></button>
-            <button onclick="document.execCommand('underline')"><u>U</u></button>
             <input type="file" id="file-input" multiple>
             <button onclick="document.getElementById('file-input').click()">Upload</button>
         </div>
