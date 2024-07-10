@@ -1,4 +1,4 @@
-![Air Notes Banned](Air_20240709_230358_0000.png)
+![Air Notes Banner](Air_20240709_230358_0000.png)
 
 # Air Notes
 
