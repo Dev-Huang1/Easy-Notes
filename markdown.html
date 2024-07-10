@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown in HTML</title>
-    <!-- Marked.js library -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Highlight.js library -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <!-- Marked.js library from unpkg -->
+    <script src="https://unpkg.com/marked@4.3.0/marked.min.js"></script>
+    <!-- Highlight.js library from unpkg -->
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.8.0/styles/default.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.8.0/highlight.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const markdownContent = document.getElementById('markdown-content').textContent;
             const htmlContent = marked(markdownContent);
             document.getElementById('html-content').innerHTML = htmlContent;
             document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightBlock(block);
+                hljs.highlightElement(block);
             });
         });
     </script>
