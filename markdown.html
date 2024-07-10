@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown in HTML</title>
+    <!-- Marked.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const markdownContent = document.getElementById('markdown-content').textContent;
+            const htmlContent = marked(markdownContent);
+            document.getElementById('html-content').innerHTML = htmlContent;
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Markdown Example</h1>
+    <!-- This element will contain the raw Markdown content -->
+    <div id="markdown-content" style="display:none;">
+        # Hello World
+
+        This is a paragraph with some **bold** text and some *italic* text.
+
+        ## Subheading
+
+        Here is a list:
+        - Item 1
+        - Item 2
+        - Item 3
+
+        ```javascript
+        // This is a code block
+        function helloWorld() {
+            console.log("Hello, world!");
+        }
+        ```
+
+        [Link to Google](https://www.google.com)
+    </div>
+    <!-- This element will display the rendered HTML content -->
+    <div id="html-content"></div>
+</body>
+</html>
