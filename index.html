@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easy Notes | Your private notes</title>
     <link rel="icon" href="assets/images/Easy-Notes-Logo.png" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.1.1/compressor.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -194,6 +195,23 @@
         #note-detail h2 {
             margin-top: 0;
         }
+
+        #note-content img, #detail-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+#note-content video, #detail-content video {
+    max-width: 100%;
+}
+
+#note-content audio, #detail-content audio {
+    width: 100%;
+}
+
+#note-content embed, #detail-content embed {
+    max-width: 100%;
+}
     </style>
 </head>
 <body>
@@ -322,37 +340,53 @@
             noteCategory.value = '';
         });
 
-        saveNoteBtn.addEventListener('click', () => {
-            const title = noteTitle.value;
-            const content = noteContent.value;
-            const category = noteCategory.value;
+        let currentEditingNoteId = null;
 
-            if (!title.trim()) {
-                alert('Please enter a title for your note.');
-                return;
-            }
+saveNoteBtn.addEventListener('click', () => {
+    const title = noteTitle.value;
+    const content = noteContent.value;
+    const category = noteCategory.value;
 
-            const noteData = {
-                title: title,
-                content: content,
-                category: category
-            };
+    if (!title.trim()) {
+        alert('Please enter a title for your note.');
+        return;
+    }
 
-            const date = new Date();
-            date.setTime(date.getTime() + (365*24*60*60*1000));
-            const expires = "expires=" + date.toUTCString();
-            const noteId = 'note_' + new Date().getTime();
-            document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))};${expires};path=/`;
+    const noteData = {
+        title: title,
+        content: content,
+        category: category
+    };
 
-            const li = createNoteListItem(noteData, noteId);
-            notesList.appendChild(li);
+    const date = new Date();
+    date.setTime(date.getTime() + (365*24*60*60*1000));
+    const expires = "expires=" + date.toUTCString();
+    
+    let noteId;
+    if (currentEditingNoteId) {
+        noteId = currentEditingNoteId;
+    } else {
+        noteId = 'note_' + new Date().getTime();
+    }
 
-            noteTitle.value = '';
-            noteContent.value = '';
-            noteCategory.value = '';
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'block';
-        });
+    document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))};${expires};path=/`;
+
+    const existingLi = Array.from(notesList.children).find(li => li.dataset.noteId === noteId);
+    if (existingLi) {
+        const newLi = createNoteListItem(noteData, noteId);
+        existingLi.replaceWith(newLi);
+    } else {
+        const li = createNoteListItem(noteData, noteId);
+        notesList.appendChild(li);
+    }
+
+    noteTitle.value = '';
+    noteContent.value = '';
+    noteCategory.value = '';
+    noteEditor.style.display = 'none';
+    notesListView.style.display = 'block';
+    currentEditingNoteId = null;
+});
 
         function editNote(noteData, noteId) {
             noteTitle.value = noteData.title;
@@ -409,12 +443,23 @@
         }
 
         fileInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    if (file.type.startsWith('image/')) {
+    const files = event.target.files;
+    Array.from(files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+            new Compressor(file, {
+                quality: 0.6,
+                maxWidth: 1000,
+                success(result) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
                         noteContent.value += `<img src="${e.target.result}" alt="${file.name}">`;
+                    };
+                    reader.readAsDataURL(result);
+                },
+                error(err) {
+                    console.log(err.message);
+                },
+            });
                     } else if (file.type.startsWith('video/')) {
                         noteContent.value += `<video controls><source src="${e.target.result}" type="${file.type}"></video>`;
                     } else if (file.type.startsWith('audio/')) {
