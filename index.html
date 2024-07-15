@@ -139,6 +139,32 @@
             background-color: #999;
         }
 
+        #search-bar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #note-category {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            margin-right: 5px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -146,6 +172,8 @@
         <h1>Easy Notes</h1>
         <ul id="notes"></ul>
         <button id="add-note-btn">+</button>
+        <!-- 在 <div id="notes-list"> 中添加搜索栏 -->
+        <input type="text" id="search-bar" placeholder="Search Notes">
     </div>
     <div id="note-editor" style="display: none;">
         <textarea id="note-content"></textarea>
@@ -153,6 +181,12 @@
             <input type="file" id="file-input" multiple>
             <button onclick="document.getElementById('file-input').click()">Upload</button>
         </div>
+        <select id="note-category">
+            <option value="">选择分类</option>
+            <option value="工作">工作</option>
+            <option value="个人">个人</option>
+            <option value="学习">学习</option>
+        </select>
         <button id="save-note-btn">Save</button>
     </div>
     <div id="delete-confirm">
@@ -161,6 +195,23 @@
         <button class="cancel">Cancel</button>
     </div>
     <script>
+        const noteCategory = document.getElementById('note-category');
+        const searchBar = document.getElementById('search-bar');
+
+    searchBar.addEventListener('input', () => {
+        const searchTerm = searchBar.value.toLowerCase();
+        const notes = document.querySelectorAll('#notes li');
+    
+    notes.forEach(note => {
+        const noteText = note.textContent.toLowerCase();
+        if (noteText.includes(searchTerm)) {
+            note.style.display = 'block';
+        } else {
+            note.style.display = 'none';
+        }
+    });
+});
+        
         document.addEventListener('DOMContentLoaded', (event) => {
             const notesList = document.getElementById('notes');
             const addNoteBtn = document.getElementById('add-note-btn');
@@ -209,6 +260,14 @@
                 noteContent.value = '';
                 noteEditor.style.display = 'none';
                 notesListView.style.display = 'block';
+
+                const category = noteCategory.value;
+                if (category) {
+                    li.dataset.category = category;
+                    const categorySpan = document.createElement('span');
+                    categorySpan.textContent = `[${category}] `;
+                    li.insertBefore(categorySpan, li.firstChild);
+                }
             });
 
             function addNoteActions(li, noteId) {
