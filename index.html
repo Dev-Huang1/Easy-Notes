@@ -120,6 +120,124 @@
                 width: 65%;
             }
         }
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+        }
+
+        #notes-list {
+            padding: 20px;
+        }
+
+        #notes-list h1 {
+            text-align: center;
+        }
+
+        #notes-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #notes-list li {
+            background: white;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #add-note-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        #note-editor {
+            padding: 20px;
+        }
+
+        #note-content {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #editor-toolbar {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        #editor-toolbar button {
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+
+        #editor-toolbar input[type="file"] {
+            display: none;
+        }
+
+        #save-note-btn {
+            display: block;
+            margin: 20px auto;
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 20px;
+        }
+
+        .note-actions {
+            margin-top: 10px;
+        }
+
+        .note-actions button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #editor-toolbar button,
+        .note-actions button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        #delete-confirm {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+            width: 30%;
+        }
+
+        @media (max-width: 768px) {
+            #delete-confirm {
+                width: 65%;
+            }
+        }
 
         #delete-confirm p {
             margin-bottom: 20px;
@@ -140,21 +258,21 @@
         }
 
         #search-bar {
-            width: 97%;
+            width: 100%;
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
+            box-sizing: border-box;
         }
 
         #note-category {
-            width: 80%;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 5px 10px;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 16px;
+            margin-left: 5px;
         }
 
         .category-tag {
@@ -166,8 +284,8 @@
             font-size: 12px;
         }
     </style>
-</head>
-<body>
+
+
     <div id="notes-list">
         <h1>Easy Notes</h1>
         <input type="text" id="search-bar" placeholder="Search Notes">
@@ -177,15 +295,15 @@
     <div id="note-editor" style="display: none;">
         <textarea id="note-content"></textarea>
         <div id="editor-toolbar">
-            <input type="file" id="file-input" multiple>
+            <input type="file" id="file-input" multiple="">
             <button onclick="document.getElementById('file-input').click()">Upload</button>
+            <select id="note-category">                
+                <option value="">Choose category</option>                
+                <option value="Work">Work</option>                
+                <option value="Person">Person</option>                
+                <option value="Learn">Learn</option>            
+            </select>
         </div>
-        <select id="note-category">
-            <option value="">选择分类</option>
-            <option value="工作">工作</option>
-            <option value="个人">个人</option>
-            <option value="学习">学习</option>
-        </select>
         <button id="save-note-btn">Save</button>
     </div>
     <div id="delete-confirm">
