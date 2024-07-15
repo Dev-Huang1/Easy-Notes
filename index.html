@@ -64,7 +64,7 @@
 
         #note-content {
             width: 100%;
-            height: 435px;
+            height: 400px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -76,6 +76,7 @@
             margin-top: 10px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
         #editor-toolbar button {
@@ -88,8 +89,6 @@
         }
 
         #save-note-btn {
-            display: block;
-            margin: 20px auto;
             background-color: #0066ff;
             color: white;
             border: none;
@@ -206,6 +205,15 @@
             height: auto;
             size: 10%;
         }
+
+        #back-to-list-main {
+            background-color: #999;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -219,16 +227,19 @@
         <input type="text" id="note-title" placeholder="Note Title">
         <textarea id="note-content"></textarea>
         <div id="editor-toolbar">
-            <input type="file" id="file-input" multiple>
-            <button onclick="document.getElementById('file-input').click()">Upload</button>
-            <select id="note-category">                
-                <option value="">Choose category</option>                
-                <option value="Work">Work</option>                
-                <option value="Personal">Personal</option>                
-                <option value="Learn">Learn</option>            
-            </select>
+            <div>
+                <input type="file" id="file-input" multiple>
+                <button onclick="document.getElementById('file-input').click()">Upload</button>
+                <select id="note-category">                
+                    <option value="">Choose category</option>                
+                    <option value="Work">Work</option>                
+                    <option value="Personal">Personal</option>                
+                    <option value="Learn">Learn</option>            
+                </select>
+            </div>
+            <button id="save-note-btn">Save</button>
         </div>
-        <button id="save-note-btn">Save</button>
+        <button id="back-to-list-main">Back to List</button>
     </div>
     <div id="delete-confirm">
         <p>Are you sure you want to delete this note?</p>
@@ -261,6 +272,7 @@
         const editNoteBtn = document.getElementById('edit-note');
         const deleteNoteBtn = document.getElementById('delete-note');
         const backToListBtn = document.getElementById('back-to-list');
+        const backToListMainBtn = document.getElementById('back-to-list-main');
 
         searchBar.addEventListener('input', () => {
             const searchTerm = searchBar.value.toLowerCase();
@@ -440,6 +452,11 @@
                 };
                 reader.readAsDataURL(file);
             });
+        });
+
+        backToListMainBtn.addEventListener('click', () => {
+            noteEditor.style.display = 'none';
+            notesListView.style.display = 'block';
         });
     </script>
 </body>
