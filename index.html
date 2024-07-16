@@ -294,174 +294,168 @@
         </div>
     </div>
     <script>
-        const elements = {
-    searchBar: document.getElementById('search-bar'),
-    notesList: document.getElementById('notes'),
-    addNoteBtn: document.getElementById('add-note-btn'),
-    noteEditor: document.getElementById('note-editor'),
-    notesListView: document.getElementById('notes-list'),
-    saveNoteBtn: document.getElementById('save-note-btn'),
-    noteContent: document.getElementById('note-content'),
-    noteTitle: document.getElementById('note-title'),
-    noteCategory: document.getElementById('note-category'),
-    fileInput: document.getElementById('file-input'),
-    noteDetail: document.getElementById('note-detail'),
-    detailTitle: document.getElementById('detail-title'),
-    detailContent: document.getElementById('detail-content'),
-    editNoteBtn: document.getElementById('edit-note'),
-    deleteNoteBtn: document.getElementById('delete-note'),
-    backToListBtn: document.getElementById('back-to-list'),
-    backToListMainBtn: document.getElementById('back-to-list-main'),
-    deleteConfirm: document.getElementById('delete-confirm'),
-    confirmDeleteBtn: document.getElementById('confirm-delete'),
-    cancelDeleteBtn: document.getElementById('cancel-delete'),
-};
-
-elements.searchBar.addEventListener('input', filterNotes);
-elements.addNoteBtn.addEventListener('click', () => showEditor());
-elements.saveNoteBtn.addEventListener('click', saveNote);
-elements.fileInput.addEventListener('change', handleFileInput);
-elements.backToListMainBtn.addEventListener('click', () => showView(elements.notesListView));
-elements.confirmDeleteBtn.addEventListener('click', confirmDelete);
-elements.cancelDeleteBtn.addEventListener('click', () => hideView(elements.deleteConfirm));
-
-document.addEventListener('DOMContentLoaded', loadNotes);
-
-function filterNotes() {
-    const searchTerm = elements.searchBar.value.toLowerCase();
-    document.querySelectorAll('#notes li').forEach(note => {
-        note.style.display = note.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none';
-    });
+        // Helper functions for cookie management
+function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + JSON.stringify(value) + ";" + expires + ";path=/";
 }
 
-function loadNotes() {
-    document.cookie.split(';').forEach(cookie => {
-        const [name, value] = cookie.split('=').map(item => item.trim());
-        if (name.startsWith('note_')) {
-            const noteData = JSON.parse(decodeURIComponent(value));
-            elements.notesList.appendChild(createNoteListItem(noteData, name));
+function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.indexOf(name + "=") == 0) {
+            return JSON.parse(cookie.substring(name.length + 1));
         }
+    }
+    return null;
+}
+
+function deleteCookie(name) {
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+// Initialize notes from cookies
+let notes = getCookie('notes') || [];
+
+// DOM Elements
+const notesList = document.getElementById('notes');
+const addNoteBtn = document.getElementById('add-note-btn');
+const noteEditor = document.getElementById('note-editor');
+const noteTitleInput = document.getElementById('note-title');
+const noteContentInput = document.getElementById('note-content');
+const saveNoteBtn = document.getElementById('save-note-btn');
+const backToListBtn = document.getElementById('back-to-list-main');
+const searchBar = document.getElementById('search-bar');
+const deleteConfirm = document.getElementById('delete-confirm');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+const cancelDeleteBtn = document.querySelector('#delete-confirm .cancel');
+const noteDetail = document.getElementById('note-detail');
+const detailTitle = document.getElementById('detail-title');
+const detailContent = document.getElementById('detail-content');
+const editNoteBtn = document.getElementById('edit-note');
+const deleteNoteBtn = document.getElementById('delete-note');
+const backToDetailListBtn = document.getElementById('back-to-list');
+
+let currentNoteIndex = null;
+
+// Display notes list
+function displayNotes() {
+    notesList.innerHTML = '';
+    notes.forEach((note, index) => {
+        const noteItem = document.createElement('li');
+        noteItem.innerHTML = `<strong>${note.title}</strong><p class="note-preview">${note.content}</p>`;
+        noteItem.addEventListener('click', () => viewNoteDetail(index));
+        notesList.appendChild(noteItem);
     });
 }
 
-function createNoteListItem(noteData, noteId) {
-    const li = document.createElement('li');
-    li.dataset.noteId = noteId;
-    li.innerHTML = `
-        <h3>${noteData.title}</h3>
-        <p class="note-preview">${getPreview(noteData.content)}</p>
-        ${noteData.category ? `<span class="category-tag">${noteData.category}</span>` : ''}
-    `;
-    li.addEventListener('click', () => showNoteDetail(noteData, noteId));
-    return li;
+// Show note editor
+function showNoteEditor() {
+    noteEditor.style.display = 'block';
+    notesList.style.display = 'none';
+    noteDetail.style.display = 'none';
 }
 
-function getPreview(content) {
-    const preview = content.replace(/<.*?>/g, match => {
-        if (/img/.test(match)) return '[图片]';
-        if (/video/.test(match)) return '[视频]';
-        if (/audio/.test(match)) return '[音频]';
-        if (/embed/.test(match)) return '[PDF]';
-        if (/a/.test(match)) return '[附件]';
-        return '';
-    }).replace(/<.*?>/g, '');
-    return preview.length > 100 ? `${preview.substr(0, 100)}...` : preview;
+// Hide note editor
+function hideNoteEditor() {
+    noteEditor.style.display = 'none';
+    notesList.style.display = 'block';
+    noteDetail.style.display = 'none';
 }
 
-function showNoteDetail(noteData, noteId) {
-    elements.detailTitle.textContent = noteData.title;
-    elements.detailContent.innerHTML = noteData.content;
-    showView(elements.noteDetail);
-    hideView(elements.notesListView);
-
-    elements.editNoteBtn.onclick = () => showEditor(noteData, noteId);
-    elements.deleteNoteBtn.onclick = () => showDeleteConfirm(noteId);
-    elements.backToListBtn.onclick = () => showView(elements.notesListView, elements.noteDetail);
+// Show note detail
+function viewNoteDetail(index) {
+    currentNoteIndex = index;
+    detailTitle.innerText = notes[index].title;
+    detailContent.innerText = notes[index].content;
+    noteEditor.style.display = 'none';
+    notesList.style.display = 'none';
+    noteDetail.style.display = 'block';
 }
 
-function showView(...views) {
-    views.forEach(view => view.style.display = 'block');
-}
+// Save note
+saveNoteBtn.addEventListener('click', () => {
+    const title = noteTitleInput.value;
+    const content = noteContentInput.value;
 
-function hideView(...views) {
-    views.forEach(view => view.style.display = 'none');
-}
-
-function showEditor(noteData = {}, noteId = '') {
-    hideView(elements.notesListView, elements.noteDetail);
-    showView(elements.noteEditor);
-
-    elements.noteTitle.value = noteData.title || '';
-    elements.noteContent.value = noteData.content || '';
-    elements.noteCategory.value = noteData.category || '';
-
-    elements.saveNoteBtn.onclick = () => saveNote(noteId);
-}
-
-function saveNote(noteId = '') {
-    const title = elements.noteTitle.value.trim();
-    const content = elements.noteContent.value;
-    const category = elements.noteCategory.value;
-
-    if (!title) {
-        alert('Please enter a title for your note.');
-        return;
-    }
-
-    const noteData = { title, content, category };
-    const cookieData = encodeURIComponent(JSON.stringify(noteData));
-    const cookieExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-    const noteCookie = `${noteId || 'note_' + Date.now()}=${cookieData};expires=${cookieExpiry};path=/`;
-
-    document.cookie = noteCookie;
-    updateNoteList(noteData, noteId);
-    showView(elements.notesListView);
-    hideView(elements.noteEditor);
-}
-
-function updateNoteList(noteData, noteId) {
-    const existingLi = Array.from(elements.notesList.children).find(li => li.dataset.noteId === noteId);
-    const newLi = createNoteListItem(noteData, noteId || 'note_' + Date.now());
-
-    if (existingLi) {
-        existingLi.replaceWith(newLi);
+    if (currentNoteIndex !== null) {
+        notes[currentNoteIndex] = { title, content };
     } else {
-        elements.notesList.appendChild(newLi);
+        notes.push({ title, content });
     }
-}
 
-function showDeleteConfirm(noteId) {
-    showView(elements.deleteConfirm);
-    elements.confirmDeleteBtn.onclick = () => deleteNote(noteId);
-}
+    setCookie('notes', notes, 365);
+    displayNotes();
+    hideNoteEditor();
+    noteTitleInput.value = '';
+    noteContentInput.value = '';
+    currentNoteIndex = null;
+});
 
-function deleteNote(noteId) {
-    document.cookie = `${noteId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    const li = Array.from(elements.notesList.children).find(li => li.dataset.noteId === noteId);
-    if (li) li.remove();
-    hideView(elements.deleteConfirm, elements.noteDetail);
-    showView(elements.notesListView);
-}
+// Add new note
+addNoteBtn.addEventListener('click', () => {
+    showNoteEditor();
+    noteTitleInput.value = '';
+    noteContentInput.value = '';
+    currentNoteIndex = null;
+});
 
-function handleFileInput(event) {
-    Array.from(event.target.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (file.type.startsWith('image/')) {
-                elements.noteContent.value += `<img src="${reader.result}" alt="${file.name}">`;
-            } else if (file.type.startsWith('video/')) {
-                elements.noteContent.value += `<video controls><source src="${reader.result}" type="${file.type}"></video>`;
-            } else if (file.type.startsWith('audio/')) {
-                elements.noteContent.value += `<audio controls><source src="${reader.result}" type="${file.type}"></audio>`;
-            } else if (file.type === 'application/pdf') {
-                elements.noteContent.value += `<embed src="${reader.result}" type="application/pdf" width="100%" height="600px">`;
-            } else {
-                elements.noteContent.value += `<a href="${reader.result}" download="${file.name}">${file.name}</a>`;
-            }
-        };
-        reader.readAsDataURL(file);
+// Go back to list from editor
+backToListBtn.addEventListener('click', () => {
+    hideNoteEditor();
+});
+
+// Search notes
+searchBar.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    const filteredNotes = notes.filter(note => note.title.toLowerCase().includes(query) || note.content.toLowerCase().includes(query));
+    notesList.innerHTML = '';
+    filteredNotes.forEach((note, index) => {
+        const noteItem = document.createElement('li');
+        noteItem.innerHTML = `<strong>${note.title}</strong><p class="note-preview">${note.content}</p>`;
+        noteItem.addEventListener('click', () => viewNoteDetail(index));
+        notesList.appendChild(noteItem);
     });
-}
+});
+
+// Show delete confirmation
+deleteNoteBtn.addEventListener('click', () => {
+    deleteConfirm.style.display = 'block';
+});
+
+// Confirm delete note
+confirmDeleteBtn.addEventListener('click', () => {
+    notes.splice(currentNoteIndex, 1);
+    setCookie('notes', notes, 365);
+    displayNotes();
+    deleteConfirm.style.display = 'none';
+    noteDetail.style.display = 'none';
+    notesList.style.display = 'block';
+});
+
+// Cancel delete note
+cancelDeleteBtn.addEventListener('click', () => {
+    deleteConfirm.style.display = 'none';
+});
+
+// Edit note
+editNoteBtn.addEventListener('click', () => {
+    showNoteEditor();
+    noteTitleInput.value = notes[currentNoteIndex].title;
+    noteContentInput.value = notes[currentNoteIndex].content;
+});
+
+// Back to notes list from detail view
+backToDetailListBtn.addEventListener('click', () => {
+    noteDetail.style.display = 'none';
+    notesList.style.display = 'block';
+});
+
+// Initialize
+displayNotes();
     </script>
 </body>
 </html>
