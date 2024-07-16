@@ -343,6 +343,7 @@
 
 
         function createNoteListItem(noteData, noteId) {
+    const li = function createNoteListItem(noteData, noteId) {
     const li = document.createElement('li');
     li.dataset.noteId = noteId;
     const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
@@ -371,6 +372,7 @@
     });
     return li;
 }
+
 
 
         function saveNote() {
@@ -406,6 +408,7 @@
     }
     showNotesList();
 }
+
 
 
         function showNotesList() {
@@ -494,40 +497,40 @@
 
         const imagePreviewsContainer = document.getElementById('image-previews');
 
-        fileInput.addEventListener('change', handleFileSelect);
+fileInput.addEventListener('change', handleFileSelect);
 
-        function handleFileSelect(event) {
-            const files = event.target.files;
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (function(file) {
-                    return function(e) {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.alt = file.name;
-                        img.classList.add('draggable');
-                        
-                        const imgContainer = document.createElement('div');
-                        imgContainer.classList.add('image-preview');
-                        
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.textContent = '×';
-                        deleteBtn.classList.add('delete-image');
-                        deleteBtn.addEventListener('click', function() {
-                            imgContainer.remove();
-                        });
+function handleFileSelect(event) {
+    const files = event.target.files;
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (function(file) {
+            return function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = file.name;
+                img.classList.add('draggable');
+                
+                const imgContainer = document.createElement('div');
+                imgContainer.classList.add('image-preview');
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '×';
+                deleteBtn.classList.add('delete-image');
+                deleteBtn.addEventListener('click', function() {
+                    imgContainer.remove();
+                });
 
-                        imgContainer.appendChild(img);
-                        imgContainer.appendChild(deleteBtn);
-                        imagePreviewsContainer.appendChild(imgContainer);
-                        
-                        // Make image draggable
-                        makeDraggable(imgContainer);
-                    };
-                })(file);
-                reader.readAsDataURL(file);
-            });
-        }
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(deleteBtn);
+                imagePreviewsContainer.appendChild(imgContainer);
+                
+                // Make image draggable
+                makeDraggable(imgContainer);
+            };
+        })(file);
+        reader.readAsDataURL(file);
+    });
+}
 
         function makeDraggable(element) {
             element.addEventListener('dragstart', handleDragStart, false);
