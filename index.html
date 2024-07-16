@@ -73,43 +73,96 @@
         }
 
         #editor-toolbar {
-            margin-top: 10px;
+            margin-top: 20px;
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             gap: 10px;
+            justify-content: space-between;
         }
 
-        #editor-toolbar button {
-            padding: 10px;
-            border-radius: 25px;
-            background-color: #0066ff;
+        #editor-toolbar button,
+        #editor-toolbar select,
+        #save-note-btn,
+        #back-to-list-main {
+            background-color: #0066FF;
             color: white;
             border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #editor-toolbar button:hover,
+        #editor-toolbar select:hover,
+        #save-note-btn:hover,
+        #back-to-list-main:hover {
+            background-color: #0052cc;
+        }
+
+        #editor-toolbar select {
+            appearance: none;
+            padding-right: 30px;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
         }
 
         #editor-toolbar input[type="file"] {
             display: none;
         }
 
-        #save-note-btn,
-        #back-to-list-main {
-            background-color: #0066ff;
+        @media (max-width: 600px) {
+            #editor-toolbar {
+                flex-direction: column;
+            }
+
+            #editor-toolbar button,
+            #editor-toolbar select,
+            #save-note-btn,
+            #back-to-list-main {
+                width: 100%;
+            }
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .editor-btn {
+            background-color: #0066FF;
             color: white;
             border: none;
+            border-radius: 20px;
             padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
-            border-radius: 25px;
-            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .editor-btn:hover {
+            background-color: #0052cc;
         }
 
         #note-category {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
+            background-color: #0066FF;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
             font-size: 16px;
-            background-color: #f0f4f8;
             cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+            padding-right: 30px;
         }
 
         .note-actions {
@@ -118,12 +171,8 @@
 
         .note-actions button {
             margin-right: 5px;
-            padding: 10px;
+            padding: 5px 10px;
             cursor: pointer;
-            border-radius: 25px;
-            background-color: #0066ff;
-            color: white;
-            border: none;
         }
 
         #delete-confirm {
@@ -153,7 +202,7 @@
             background-color: #0066ff;
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 5px;
             padding: 10px 20px;
             cursor: pointer;
             margin-right: 10px;
@@ -206,13 +255,20 @@
             size: 10%;
         }
 
-        #back-to-list-main {
-            background-color: #0066ff;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            cursor: pointer;
+        @media (max-width: 600px) {
+            #editor-toolbar {
+                flex-direction: column;
+            }
+
+            .toolbar-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .editor-btn, #note-category {
+                flex: 1;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -227,19 +283,19 @@
         <input type="text" id="note-title" placeholder="Note Title">
         <textarea id="note-content"></textarea>
         <div id="editor-toolbar">
-            <div>
-                <input type="file" id="file-input" multiple>
-                <button onclick="document.getElementById('file-input').click()">Upload</button>
-                <select id="note-category">                
-                    <option value="">Choose category</option>                
-                    <option value="Work">Work</option>                
-                    <option value="Personal">Personal</option>                
-                    <option value="Learn">Learn</option>            
-                </select>
-            </div>
+            <input type="file" id="file-input" multiple>
+            <button onclick="document.getElementById('file-input').click()">Upload</button>
+            <select id="note-category">                
+                <option value="">Choose category</option>                
+                <option value="Work">Work</option>                
+                <option value="Personal">Personal</option>                
+                <option value="Learn">Learn</option>            
+            </select>
             <button id="save-note-btn">Save</button>
+            <button id="back-to-list-main">Back to List</button>
         </div>
-        <button id="back-to-list-main">Back to List</button>
+    </div>
+        <input type="file" id="file-input" multiple style="display: none;">
     </div>
     <div id="delete-confirm">
         <p>Are you sure you want to delete this note?</p>
@@ -250,123 +306,159 @@
         <h2 id="detail-title"></h2>
         <div id="detail-content"></div>
         <div class="note-actions">
-            <button id="edit-note">Edit</button>
-            <button id="delete-note">Delete</button>
-            <button id="back-to-list">Back to List</button>
+            <button id="edit-note" class="editor-btn">Edit</button>
+            <button id="delete-note" class="editor-btn">Delete</button>
+            <button id="back-to-list" class="editor-btn">Back to List</button>
         </div>
     </div>
     <script>
-         const notesList = document.getElementById('notesList');
-        const noteEditor = document.getElementById('noteEditor');
-        const notesListView = document.getElementById('notesListView');
-        const noteDetail = document.getElementById('noteDetail');
-        const noteTitle = document.getElementById('noteTitle');
-        const noteContent = document.getElementById('noteContent');
-        const noteCategory = document.getElementById('noteCategory');
-        const detailTitle = document.getElementById('detailTitle');
-        const detailContent = document.getElementById('detailContent');
-        const addNoteBtn = document.getElementById('addNoteBtn');
-        const saveNoteBtn = document.getElementById('saveNoteBtn');
-        const backToListBtn = document.getElementById('backToListBtn');
-        const backToListMainBtn = document.getElementById('backToListMainBtn');
-        const editNoteBtn = document.getElementById('editNoteBtn');
-        const deleteNoteBtn = document.getElementById('deleteNoteBtn');
+        const noteCategory = document.getElementById('note-category');
+        const searchBar = document.getElementById('search-bar');
+        const notesList = document.getElementById('notes');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const noteEditor = document.getElementById('note-editor');
+        const notesListView = document.getElementById('notes-list');
+        const saveNoteBtn = document.getElementById('save-note-btn');
+        const noteContent = document.getElementById('note-content');
+        const noteTitle = document.getElementById('note-title');
+        const fileInput = document.getElementById('file-input');
+        const noteDetail = document.getElementById('note-detail');
+        const detailTitle = document.getElementById('detail-title');
+        const detailContent = document.getElementById('detail-content');
+        const editNoteBtn = document.getElementById('edit-note');
+        const deleteNoteBtn = document.getElementById('delete-note');
+        const backToListBtn = document.getElementById('back-to-list');
+        const backToListMainBtn = document.getElementById('back-to-list-main');
+        const uploadBtn = document.getElementById('upload-btn');
 
-        let currentNoteId = null;
-
+        searchBar.addEventListener('input', () => {
+            const searchTerm = searchBar.value.toLowerCase();
+            const notes = document.querySelectorAll('#notes li');
+        
+            notes.forEach(note => {
+                const noteText = note.textContent.toLowerCase();
+                if (noteText.includes(searchTerm)) {
+                    note.style.display = 'block';
+                } else {
+                    note.style.display = 'none';
+                }
+            });
+        });
+        
         function loadNotes() {
-            notesList.innerHTML = '';
             const cookies = document.cookie.split(';');
             cookies.forEach(cookie => {
                 const [name, value] = cookie.split('=');
                 if (name.trim().startsWith('note_')) {
                     const noteData = JSON.parse(decodeURIComponent(value));
-                    const li = document.createElement('li');
-                    li.textContent = noteData.title;
-                    li.addEventListener('click', () => showNoteDetail(name.trim(), noteData));
+                    const li = createNoteListItem(noteData, name.trim());
                     notesList.appendChild(li);
                 }
             });
         }
 
-        function saveNote() {
-            const title = noteTitle.value.trim();
-            const content = noteContent.value.trim();
-            const category = noteCategory.value.trim();
-
-            if (!title || !content) {
-                alert('Title and content cannot be empty!');
-                return;
-            }
-
-            const noteId = currentNoteId || 'note_' + Date.now();
-            const noteData = { title, content, category };
-
-            document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))};path=/`;
-            loadNotes();
-            resetEditor();
-            showListView();
+        function createNoteListItem(noteData, noteId) {
+            const li = document.createElement('li');
+            li.dataset.noteId = noteId;
+            li.innerHTML = `
+                <h3>${noteData.title}</h3>
+                <p class="note-preview">${getPreview(noteData.content)}</p>
+                ${noteData.category ? `<span class="category-tag">${noteData.category}</span>` : ''}
+            `;
+            li.onclick = () => showNoteDetail(noteData, noteId);
+            return li;
         }
 
-        function showNoteDetail(noteId, noteData) {
-            currentNoteId = noteId;
+        function getPreview(content) {
+            let preview = content.replace(/<img.*?>/g, '[图片]')
+                                 .replace(/<video.*?>/g, '[视频]')
+                                 .replace(/<audio.*?>/g, '[音频]')
+                                 .replace(/<embed.*?>/g, '[PDF]')
+                                 .replace(/<a.*?>/g, '[附件]')
+                                 .replace(/<.*?>/g, '');
+            return preview.length > 100 ? preview.substr(0, 100) + '...' : preview;
+        }
+
+        function showNoteDetail(noteData, noteId) {
             detailTitle.textContent = noteData.title;
-            detailContent.textContent = noteData.content;
+            detailContent.innerHTML = noteData.content;
             noteDetail.style.display = 'block';
             notesListView.style.display = 'none';
+
+            editNoteBtn.onclick = () => editExistingNote(noteData, noteId);
+            deleteNoteBtn.onclick = () => deleteNote(noteId);
+            backToListBtn.onclick = () => {
+                noteDetail.style.display = 'none';
+                notesListView.style.display = 'block';
+            };
         }
 
-        function showListView() {
-            noteDetail.style.display = 'none';
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'block';
-        }
+        loadNotes();
 
-        function showEditorView() {
-            noteEditor.style.display = 'block';
+        addNoteBtn.addEventListener('click', () => {
             notesListView.style.display = 'none';
-        }
-
-        function resetEditor() {
+            noteDetail.style.display = 'none';
+            noteEditor.style.display = 'block';
             noteTitle.value = '';
             noteContent.value = '';
             noteCategory.value = '';
-            currentNoteId = null;
-        }
-
-        addNoteBtn.addEventListener('click', () => {
-            resetEditor();
-            showEditorView();
         });
 
-        saveNoteBtn.addEventListener('click', saveNote);
+        saveNoteBtn.addEventListener('click', () => {
+            const title = noteTitle.value;
+            const content = noteContent.value;
+            const category = noteCategory.value;
 
-        backToListBtn.addEventListener('click', showListView);
-        backToListMainBtn.addEventListener('click', showListView);
+            if (!title.trim()) {
+                alert('Please enter a title for your note.');
+                return;
+            }
 
-        editNoteBtn.addEventListener('click', () => {
-            const title = detailTitle.textContent;
-            const content = detailContent.textContent;
+            const noteData = {
+                title: title,
+                content: content,
+                category: category
+            };
 
-            noteTitle.value = title;
-            noteContent.value = content;
+            const date = new Date();
+            date.setTime(date.getTime() + (365*24*60*60*1000));
+            const expires = "expires=" + date.toUTCString();
+            const noteId = 'note_' + new Date().getTime();
+            document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))};${expires};path=/`;
 
-            showEditorView();
+            const li = createNoteListItem(noteData, noteId);
+            notesList.appendChild(li);
+
+            noteTitle.value = '';
+            noteContent.value = '';
+            noteCategory.value = '';
+            noteEditor.style.display = 'none';
+            notesListView.style.display = 'block';
         });
 
-        deleteNoteBtn.addEventListener('click', () => {
-            const cookies = document.cookie.split(';');
-            cookies.forEach(cookie => {
-                const [name, value] = cookie.split('=');
-                if (name.trim() === currentNoteId) {
-                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
+        function editExistingNote(noteData, noteId) {
+            noteTitle.value = noteData.title;
+            noteContent.value = noteData.content;
+            noteCategory.value = noteData.category || '';
+            noteDetail.style.display = 'none';
+            noteEditor.style.display = 'block';
+
+            saveNoteBtn.onclick = () => {
+                const updatedNoteData = {
+                    title: noteTitle.value,
+                    content: noteContent.value,
+                    category: noteCategory.value
+                };
+
+                const date = new Date();
+                date.setTime(date.getTime() + (365*24*60*60*1000));
+                const expires = "expires=" + date.toUTCString();
+                document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(updatedNoteData))};${expires};path=/`;
+
+                const existingLi = Array.from(notesList.children).find(li => li.dataset.noteId === noteId);
+                if (existingLi) {
+                    const newLi = createNoteListItem(updatedNoteData, noteId);
+                    existingLi.replaceWith(newLi);
                 }
-            });
-            loadNotes();
-            showListView();
-        });
 
-        document.addEventListener('DOMContentLoaded', loadNotes);
-    </script>
-</body>
-</html>
+                noteEditor.style
