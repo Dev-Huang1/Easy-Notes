@@ -127,42 +127,13 @@
             }
         }
 
-        .toolbar-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .editor-btn {
-            background-color: #0066FF;
+        #save-note-btn {
+            background-color: #0066ff;
             color: white;
             border: none;
-            border-radius: 20px;
             padding: 10px 20px;
-            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .editor-btn:hover {
-            background-color: #0052cc;
-        }
-
-        #note-category {
-            background-color: #0066FF;
-            color: white;
-            border: none;
             border-radius: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 12px auto;
-            padding-right: 30px;
         }
 
         .note-actions {
@@ -173,6 +144,17 @@
             margin-right: 5px;
             padding: 5px 10px;
             cursor: pointer;
+        }
+
+        #editor-toolbar button,
+        .note-actions button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 5px;
         }
 
         #delete-confirm {
@@ -222,6 +204,14 @@
             box-sizing: border-box;
         }
 
+        #note-category {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+
         .category-tag {
             display: inline-block;
             padding: 2px 8px;
@@ -255,20 +245,13 @@
             size: 10%;
         }
 
-        @media (max-width: 600px) {
-            #editor-toolbar {
-                flex-direction: column;
-            }
-
-            .toolbar-group {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .editor-btn, #note-category {
-                flex: 1;
-                text-align: center;
-            }
+        #back-to-list-main {
+            background-color: #999;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -279,6 +262,7 @@
         <ul id="notes"></ul>
         <button id="add-note-btn">+</button>
     </div>
+    <div id="note-editor" style="display: none;">
     <div id="note-editor" style="display: none;">
         <input type="text" id="note-title" placeholder="Note Title">
         <textarea id="note-content"></textarea>
@@ -295,8 +279,6 @@
             <button id="back-to-list-main">Back to List</button>
         </div>
     </div>
-        <input type="file" id="file-input" multiple style="display: none;">
-    </div>
     <div id="delete-confirm">
         <p>Are you sure you want to delete this note?</p>
         <button id="confirm-delete">Delete</button>
@@ -306,9 +288,9 @@
         <h2 id="detail-title"></h2>
         <div id="detail-content"></div>
         <div class="note-actions">
-            <button id="edit-note" class="editor-btn">Edit</button>
-            <button id="delete-note" class="editor-btn">Delete</button>
-            <button id="back-to-list" class="editor-btn">Back to List</button>
+            <button id="edit-note">Edit</button>
+            <button id="delete-note">Delete</button>
+            <button id="back-to-list">Back to List</button>
         </div>
     </div>
     <script>
@@ -329,7 +311,6 @@
         const deleteNoteBtn = document.getElementById('delete-note');
         const backToListBtn = document.getElementById('back-to-list');
         const backToListMainBtn = document.getElementById('back-to-list-main');
-        const uploadBtn = document.getElementById('upload-btn');
 
         searchBar.addEventListener('input', () => {
             const searchTerm = searchBar.value.toLowerCase();
@@ -461,4 +442,60 @@
                     existingLi.replaceWith(newLi);
                 }
 
-                noteEditor.style
+                noteEditor.style.display = 'none';
+                notesListView.style.display = 'block';
+
+                // Reset saveNoteBtn onclick to its original function
+                saveNoteBtn.onclick = null;
+            };
+        }
+
+        function deleteNote(noteId) {
+            const deleteConfirm = document.getElementById('delete-confirm');
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            const cancelBtn = deleteConfirm.querySelector('.cancel');
+
+            deleteConfirm.style.display = 'block';
+
+            confirmDeleteBtn.onclick = () => {
+                document.cookie = `${noteId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                const li = Array.from(notesList.children).find(li => li.dataset.noteId === noteId);
+                if (li) li.remove();
+                deleteConfirm.style.display = 'none';
+                noteDetail.style.display = 'none';
+                notesListView.style.display = 'block';
+            };
+
+            cancelBtn.onclick = () => {
+                deleteConfirm.style.display = 'none';
+            };
+        }
+
+        fileInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (file.type.startsWith('image/')) {
+                        noteContent.value += `<img src="${e.target.result}" alt="${file.name}">`;
+                    } else if (file.type.startsWith('video/')) {
+                        noteContent.value += `<video controls><source src="${e.target.result}" type="${file.type}"></video>`;
+                    } else if (file.type.startsWith('audio/')) {
+                        noteContent.value += `<audio controls><source src="${e.target.result}" type="${file.type}"></audio>`;
+                    } else if (file.type === 'application/pdf') {
+                        noteContent.value += `<embed src="${e.target.result}" type="application/pdf" width="100%" height="600px">`;
+                    } else {
+                        noteContent.value += `<a href="${e.target.result}" download="${file.name}">${file.name}</a>`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        backToListMainBtn.addEventListener('click', () => {
+            noteEditor.style.display = 'none';
+            notesListView.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
