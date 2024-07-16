@@ -293,7 +293,7 @@
             <button id="back-to-list">Back to List</button>
         </div>
     </div>
-    <script>                   
+    <script>
     const searchBar = document.getElementById('search-bar');
     const notesList = document.getElementById('notes');
     const addNoteBtn = document.getElementById('add-note-btn');
@@ -302,6 +302,7 @@
     const saveNoteBtn = document.getElementById('save-note-btn');
     const noteContent = document.getElementById('note-content');
     const noteTitle = document.getElementById('note-title');
+    const noteCategory = document.getElementById('note-category');
     const fileInput = document.getElementById('file-input');
     const noteDetail = document.getElementById('note-detail');
     const detailTitle = document.getElementById('detail-title');
@@ -382,9 +383,10 @@
         noteTitle.value = '';
         noteContent.value = '';
         noteCategory.value = '';
+        saveNoteBtn.onclick = saveNewNote;
     });
 
-    saveNoteBtn.addEventListener('click', () => {
+    function saveNewNote() {
         const title = noteTitle.value;
         const content = noteContent.value;
         const category = noteCategory.value;
@@ -414,7 +416,7 @@
         noteCategory.value = '';
         noteEditor.style.display = 'none';
         notesListView.style.display = 'block';
-    });
+    }
 
     function editExistingNote(noteData, noteId) {
         noteTitle.value = noteData.title;
@@ -443,9 +445,6 @@
 
             noteEditor.style.display = 'none';
             notesListView.style.display = 'block';
-
-            // Reset saveNoteBtn onclick to its original function
-            saveNoteBtn.onclick = null;
         };
     }
 
