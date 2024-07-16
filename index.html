@@ -330,16 +330,17 @@
         });
         
         function loadNotes() {
-            const cookies = document.cookie.split(';');
-            cookies.forEach(cookie => {
-                const [name, value] = cookie.split('=');
-                if (name.trim().startsWith('note_')) {
-                    const noteData = JSON.parse(decodeURIComponent(value));
-                    const li = createNoteListItem(noteData, name.trim());
-                    notesList.appendChild(li);
-                }
-            });
+    const cookies = document.cookie.split(';');
+    cookies.forEach(cookie => {
+        const [name, value] = cookie.split('=');
+        if (name.trim().startsWith('note_')) {
+            const noteData = JSON.parse(decodeURIComponent(value));
+            const li = createNoteListItem(noteData, name.trim());
+            notesList.appendChild(li);
         }
+    });
+}
+
 
         function createNoteListItem(noteData, noteId) {
     const li = document.createElement('li');
@@ -373,45 +374,39 @@
 
 
         function saveNote() {
-            const noteData = {
-                title: noteTitle.value,
-                content: noteContent.value,
-                category: noteCategory.value,
-                files: []
-            };
+    const noteData = {
+        title: noteTitle.value,
+        content: noteContent.value,
+        category: noteCategory.value,
+        files: []
+    };
 
-            const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
+    const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
 
-            if (fileInput.files.length > 0) {
-                Array.from(fileInput.files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        noteData.files.push({
-                            name: file.name,
-                            content: e.target.result
-                        });
-                        if (noteData.files.length === fileInput.files.length) {
-                            saveNoteToCookies(noteId, noteData);
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                });
-            } else {
-                saveNoteToCookies(noteId, noteData);
-            }
-        }
+    const previewImages = imagePreviewsContainer.querySelectorAll('img');
+    previewImages.forEach(img => {
+        noteData.files.push({
+            name: img.alt,
+            content: img.src
+        });
+    });
+
+    saveNoteToCookies(noteId, noteData);
+}
+
 
         function saveNoteToCookies(noteId, noteData) {
-            document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))}; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
-            const li = createNoteListItem(noteData, noteId);
-            const existingLi = notesList.querySelector(`li[data-note-id="${noteId}"]`);
-            if (existingLi) {
-                existingLi.replaceWith(li);
-            } else {
-                notesList.appendChild(li);
-            }
-            showNotesList();
-        }
+    document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))}; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
+    const li = createNoteListItem(noteData, noteId);
+    const existingLi = notesList.querySelector(`li[data-note-id="${noteId}"]`);
+    if (existingLi) {
+        existingLi.replaceWith(li);
+    } else {
+        notesList.appendChild(li);
+    }
+    showNotesList();
+}
+
 
         function showNotesList() {
             noteEditor.style.display = 'none';
@@ -432,22 +427,33 @@
         }
 
         function showNoteDetail(noteId, noteData) {
-            detailTitle.textContent = noteData.title;
-            detailContent.innerHTML = noteData.content.replace(/\n/g, '<br>');
-            if (noteData.files) {
-                noteData.files.forEach(file => {
-                    const img = document.createElement('img');
-                    img.src = file.content;
-                    img.alt = file.name;
-                    detailContent.appendChild(img);
-                });
+    detailTitle.textContent = noteData.title;
+    detailContent.innerHTML = noteData.content.replace(/\n/g, '<br>');
+    detailContent.innerHTML += '<br>';  // Add a line break for separation
+
+    if (noteData.files) {
+        noteData.files.forEach(file => {
+            const fileTag = document.createElement('div');
+            if (file.content.startsWith('data:image')) {
+                const img = document.createElement('img');
+                img.src = file.content;
+                img.alt = file.name;
+                fileTag.appendChild(img);
+            } else if (file.content.startsWith('data:video')) {
+                fileTag.textContent = '[Video]';
+            } else {
+                fileTag.textContent = '[File]';
             }
-            noteDetail.dataset.noteId = noteId;
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'none';
-            noteDetail.style.display = 'block';
-            searchBar.style.display = 'none';
-        }
+            detailContent.appendChild(fileTag);
+        });
+    }
+
+    noteDetail.dataset.noteId = noteId;
+    noteEditor.style.display = 'none';
+    notesListView.style.display = 'none';
+    noteDetail.style.display = 'block';
+    searchBar.style.display = 'none';
+}
 
         function deleteNote() {
             const noteId = noteDetail.dataset.noteId;
@@ -568,28 +574,6 @@
 
         // Call updateDraggableElements initially and whenever the DOM changes
         updateDraggableElements();
-
-        // Modify the saveNote function to handle files
-        function saveNote() {
-            const noteData = {
-                title: noteTitle.value,
-                content: noteContent.value,
-                category: noteCategory.value,
-                files: []
-            };
-
-            const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
-
-            const previewImages = imagePreviewsContainer.querySelectorAll('img');
-            previewImages.forEach(img => {
-                noteData.files.push({
-                    name: img.alt,
-                    content: img.src
-                });
-            });
-
-            saveNoteToCookies(noteId, noteData);
-        }
     </script>
 </body>
 </html>
