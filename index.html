@@ -266,6 +266,7 @@
     <div id="note-editor" style="display: none;">
         <input type="text" id="note-title" placeholder="Note Title">
         <textarea id="note-content"></textarea>
+        <div id="image-previews" class="image-preview-container"></div>
         <div id="editor-toolbar">
             <div>
                 <input type="file" id="file-input" multiple>
@@ -465,6 +466,111 @@
         backToListBtn.addEventListener('click', showNotesList);
 
         loadNotes();
+
+        const imagePreviewsContainer = document.getElementById('image-previews');
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (function(file) {
+                    return function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = file.name;
+                        img.classList.add('draggable');
+                        
+                        const imgContainer = document.createElement('div');
+                        imgContainer.classList.add('image-preview');
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = '×';
+                        deleteBtn.classList.add('delete-image');
+                        deleteBtn.addEventListener('click', function() {
+                            imgContainer.remove();
+                        });
+
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(deleteBtn);
+                        imagePreviewsContainer.appendChild(imgContainer);
+                        
+                        // Make image draggable
+                        makeDraggable(imgContainer);
+                    };
+                })(file);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function makeDraggable(element) {
+            element.addEventListener('dragstart', handleDragStart, false);
+            element.addEventListener('dragover', handleDragOver, false);
+            element.addEventListener('drop', handleDrop, false);
+        }
+
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault(); // Necessary. Allows us to drop.
+            }
+            e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation(); // Stops some browsers from redirecting.
+            }
+
+            // Don't do anything if dropping the same image we're dragging.
+            if (draggedElement != this) {
+                const parent = this.parentNode;
+                parent.insertBefore(draggedElement, this.nextSibling);
+            }
+
+            return false;
+        }
+        
+        // Ensure draggable elements are correctly marked
+        function updateDraggableElements() {
+            const previews = imagePreviewsContainer.querySelectorAll('.image-preview');
+            previews.forEach(preview => {
+                makeDraggable(preview);
+            });
+        }
+
+        // Call updateDraggableElements initially and whenever the DOM changes
+        updateDraggableElements();
+
+        // Modify the saveNote function to handle files
+        function saveNote() {
+            const noteData = {
+                title: noteTitle.value,
+                content: noteContent.value,
+                category: noteCategory.value,
+                files: []
+            };
+
+            const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
+
+            const previewImages = imagePreviewsContainer.querySelectorAll('img');
+            previewImages.forEach(img => {
+                noteData.files.push({
+                    name: img.alt,
+                    content: img.src
+                });
+            });
+
+            saveNoteToCookies(noteId, noteData);
+        }
     </script>
 </body>
 </html>
