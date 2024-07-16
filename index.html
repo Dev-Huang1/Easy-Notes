@@ -256,39 +256,26 @@
         </div>
     </div>
     <script>
-        const noteCategory = document.getElementById('note-category');
-        const searchBar = document.getElementById('search-bar');
-        const notesList = document.getElementById('notes');
-        const addNoteBtn = document.getElementById('add-note-btn');
-        const noteEditor = document.getElementById('note-editor');
-        const notesListView = document.getElementById('notes-list');
-        const saveNoteBtn = document.getElementById('save-note-btn');
-        const noteContent = document.getElementById('note-content');
-        const noteTitle = document.getElementById('note-title');
-        const fileInput = document.getElementById('file-input');
-        const noteDetail = document.getElementById('note-detail');
-        const detailTitle = document.getElementById('detail-title');
-        const detailContent = document.getElementById('detail-content');
-        const editNoteBtn = document.getElementById('edit-note');
-        const deleteNoteBtn = document.getElementById('delete-note');
-        const backToListBtn = document.getElementById('back-to-list');
-        const backToListMainBtn = document.getElementById('back-to-list-main');
+         const notesList = document.getElementById('notesList');
+        const noteEditor = document.getElementById('noteEditor');
+        const notesListView = document.getElementById('notesListView');
+        const noteDetail = document.getElementById('noteDetail');
+        const noteTitle = document.getElementById('noteTitle');
+        const noteContent = document.getElementById('noteContent');
+        const noteCategory = document.getElementById('noteCategory');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailContent = document.getElementById('detailContent');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+        const saveNoteBtn = document.getElementById('saveNoteBtn');
+        const backToListBtn = document.getElementById('backToListBtn');
+        const backToListMainBtn = document.getElementById('backToListMainBtn');
+        const editNoteBtn = document.getElementById('editNoteBtn');
+        const deleteNoteBtn = document.getElementById('deleteNoteBtn');
 
-        searchBar.addEventListener('input', () => {
-            const searchTerm = searchBar.value.toLowerCase();
-            const notes = document.querySelectorAll('#notes li');
-        
-            notes.forEach(note => {
-                const noteText = note.textContent.toLowerCase();
-                if (noteText.includes(searchTerm)) {
-                    note.style.display = 'block';
-                } else {
-                    note.style.display = 'none';
-                }
-            });
-        });
-        
+        let currentNoteId = null;
+
         function loadNotes() {
+            notesList.innerHTML = '';
             const cookies = document.cookie.split(';');
             cookies.forEach(cookie => {
                 const [name, value] = cookie.split('=');
@@ -296,7 +283,7 @@
                     const noteData = JSON.parse(decodeURIComponent(value));
                     const li = document.createElement('li');
                     li.textContent = noteData.title;
-                    li.addEventListener('click', () => showNoteDetail(noteData));
+                    li.addEventListener('click', () => showNoteDetail(name.trim(), noteData));
                     notesList.appendChild(li);
                 }
             });
@@ -312,7 +299,7 @@
                 return;
             }
 
-            const noteId = 'note_' + Date.now();
+            const noteId = currentNoteId || 'note_' + Date.now();
             const noteData = { title, content, category };
 
             document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))};path=/`;
@@ -321,7 +308,8 @@
             showListView();
         }
 
-        function showNoteDetail(noteData) {
+        function showNoteDetail(noteId, noteData) {
+            currentNoteId = noteId;
             detailTitle.textContent = noteData.title;
             detailContent.textContent = noteData.content;
             noteDetail.style.display = 'block';
@@ -343,9 +331,11 @@
             noteTitle.value = '';
             noteContent.value = '';
             noteCategory.value = '';
+            currentNoteId = null;
         }
 
         addNoteBtn.addEventListener('click', () => {
+            resetEditor();
             showEditorView();
         });
 
@@ -365,12 +355,10 @@
         });
 
         deleteNoteBtn.addEventListener('click', () => {
-            const title = detailTitle.textContent;
             const cookies = document.cookie.split(';');
             cookies.forEach(cookie => {
-                const [name] = cookie.split('=');
-                const noteData = JSON.parse(decodeURIComponent(name));
-                if (noteData.title === title) {
+                const [name, value] = cookie.split('=');
+                if (name.trim() === currentNoteId) {
                     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
                 }
             });
