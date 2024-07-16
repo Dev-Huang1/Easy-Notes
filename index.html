@@ -292,12 +292,14 @@
         function createNoteListItem(noteData, noteId) {
             const li = document.createElement('li');
             li.dataset.noteId = noteId;
-            li.innerHTML = `<strong>${noteData.title}</strong> <span class="category-tag">${noteData.category}</span> <div class="note-preview">${noteData.content.substring(0, 50)}</div>`;
+            const categoryTag = noteData.category ? `<span class="category-tag">${noteData.category}</span>` : '';
+            li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${noteData.content.substring(0, 50)}</div>`;
             li.addEventListener('click', () => {
-                showNoteDetail(noteId, noteData);
-            });
-            return li;
-        }
+        showNoteDetail(noteId, noteData);
+    });
+    return li;
+}
+
 
         function saveNote() {
             const noteData = {
