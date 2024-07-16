@@ -75,26 +75,41 @@
         #editor-toolbar {
             margin-top: 10px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 10px;
         }
 
         #editor-toolbar button {
-            padding: 5px 10px;
-            margin-right: 5px;
+            padding: 10px;
+            border-radius: 25px;
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
 
         #editor-toolbar input[type="file"] {
             display: none;
         }
 
-        #save-note-btn {
+        #save-note-btn,
+        #back-to-list-main {
             background-color: #0066ff;
             color: white;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
-            border-radius: 20px;
+            border-radius: 25px;
+            margin-top: 10px;
+        }
+
+        #note-category {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            background-color: #f0f4f8;
+            cursor: pointer;
         }
 
         .note-actions {
@@ -103,19 +118,12 @@
 
         .note-actions button {
             margin-right: 5px;
-            padding: 5px 10px;
+            padding: 10px;
             cursor: pointer;
-        }
-
-        #editor-toolbar button,
-        .note-actions button {
+            border-radius: 25px;
             background-color: #0066ff;
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin-right: 5px;
         }
 
         #delete-confirm {
@@ -145,7 +153,7 @@
             background-color: #0066ff;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             padding: 10px 20px;
             cursor: pointer;
             margin-right: 10px;
@@ -163,14 +171,6 @@
             border-radius: 5px;
             font-size: 16px;
             box-sizing: border-box;
-        }
-
-        #note-category {
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            margin-left: 5px;
         }
 
         .category-tag {
@@ -207,10 +207,10 @@
         }
 
         #back-to-list-main {
-            background-color: #999;
+            background-color: #0066ff;
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             padding: 10px 20px;
             cursor: pointer;
         }
@@ -294,170 +294,91 @@
                 const [name, value] = cookie.split('=');
                 if (name.trim().startsWith('note_')) {
                     const noteData = JSON.parse(decodeURIComponent(value));
-                    const li = createNoteListItem(noteData, name.trim());
+                    const li = document.createElement('li');
+                    li.textContent = noteData.title;
+                    li.addEventListener('click', () => showNoteDetail(noteData));
                     notesList.appendChild(li);
                 }
             });
         }
 
-        function createNoteListItem(noteData, noteId) {
-            const li = document.createElement('li');
-            li.dataset.noteId = noteId;
-            li.innerHTML = `
-                <h3>${noteData.title}</h3>
-                <p class="note-preview">${getPreview(noteData.content)}</p>
-                ${noteData.category ? `<span class="category-tag">${noteData.category}</span>` : ''}
-            `;
-            li.onclick = () => showNoteDetail(noteData, noteId);
-            return li;
-        }
+        function saveNote() {
+            const title = noteTitle.value.trim();
+            const content = noteContent.value.trim();
+            const category = noteCategory.value.trim();
 
-        function getPreview(content) {
-            let preview = content.replace(/<img.*?>/g, '[图片]')
-                                 .replace(/<video.*?>/g, '[视频]')
-                                 .replace(/<audio.*?>/g, '[音频]')
-                                 .replace(/<embed.*?>/g, '[PDF]')
-                                 .replace(/<a.*?>/g, '[附件]')
-                                 .replace(/<.*?>/g, '');
-            return preview.length > 100 ? preview.substr(0, 100) + '...' : preview;
-        }
-
-        function showNoteDetail(noteData, noteId) {
-            detailTitle.textContent = noteData.title;
-            detailContent.innerHTML = noteData.content;
-            noteDetail.style.display = 'block';
-            notesListView.style.display = 'none';
-
-            editNoteBtn.onclick = () => editExistingNote(noteData, noteId);
-            deleteNoteBtn.onclick = () => deleteNote(noteId);
-            backToListBtn.onclick = () => {
-                noteDetail.style.display = 'none';
-                notesListView.style.display = 'block';
-            };
-        }
-
-        loadNotes();
-
-        addNoteBtn.addEventListener('click', () => {
-            notesListView.style.display = 'none';
-            noteDetail.style.display = 'none';
-            noteEditor.style.display = 'block';
-            noteTitle.value = '';
-            noteContent.value = '';
-            noteCategory.value = '';
-        });
-
-        saveNoteBtn.addEventListener('click', () => {
-            const title = noteTitle.value;
-            const content = noteContent.value;
-            const category = noteCategory.value;
-
-            if (!title.trim()) {
-                alert('Please enter a title for your note.');
+            if (!title || !content) {
+                alert('Title and content cannot be empty!');
                 return;
             }
 
-            const noteData = {
-                title: title,
-                content: content,
-                category: category
-            };
+            const noteId = 'note_' + Date.now();
+            const noteData = { title, content, category };
 
-            const date = new Date();
-            date.setTime(date.getTime() + (365*24*60*60*1000));
-            const expires = "expires=" + date.toUTCString();
-            const noteId = 'note_' + new Date().getTime();
-            document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))};${expires};path=/`;
+            document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))};path=/`;
+            loadNotes();
+            resetEditor();
+            showListView();
+        }
 
-            const li = createNoteListItem(noteData, noteId);
-            notesList.appendChild(li);
+        function showNoteDetail(noteData) {
+            detailTitle.textContent = noteData.title;
+            detailContent.textContent = noteData.content;
+            noteDetail.style.display = 'block';
+            notesListView.style.display = 'none';
+        }
 
+        function showListView() {
+            noteDetail.style.display = 'none';
+            noteEditor.style.display = 'none';
+            notesListView.style.display = 'block';
+        }
+
+        function showEditorView() {
+            noteEditor.style.display = 'block';
+            notesListView.style.display = 'none';
+        }
+
+        function resetEditor() {
             noteTitle.value = '';
             noteContent.value = '';
             noteCategory.value = '';
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'block';
+        }
+
+        addNoteBtn.addEventListener('click', () => {
+            showEditorView();
         });
 
-        function editExistingNote(noteData, noteId) {
-            noteTitle.value = noteData.title;
-            noteContent.value = noteData.content;
-            noteCategory.value = noteData.category || '';
-            noteDetail.style.display = 'none';
-            noteEditor.style.display = 'block';
+        saveNoteBtn.addEventListener('click', saveNote);
 
-            saveNoteBtn.onclick = () => {
-                const updatedNoteData = {
-                    title: noteTitle.value,
-                    content: noteContent.value,
-                    category: noteCategory.value
-                };
+        backToListBtn.addEventListener('click', showListView);
+        backToListMainBtn.addEventListener('click', showListView);
 
-                const date = new Date();
-                date.setTime(date.getTime() + (365*24*60*60*1000));
-                const expires = "expires=" + date.toUTCString();
-                document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(updatedNoteData))};${expires};path=/`;
+        editNoteBtn.addEventListener('click', () => {
+            const title = detailTitle.textContent;
+            const content = detailContent.textContent;
 
-                const existingLi = Array.from(notesList.children).find(li => li.dataset.noteId === noteId);
-                if (existingLi) {
-                    const newLi = createNoteListItem(updatedNoteData, noteId);
-                    existingLi.replaceWith(newLi);
+            noteTitle.value = title;
+            noteContent.value = content;
+
+            showEditorView();
+        });
+
+        deleteNoteBtn.addEventListener('click', () => {
+            const title = detailTitle.textContent;
+            const cookies = document.cookie.split(';');
+            cookies.forEach(cookie => {
+                const [name] = cookie.split('=');
+                const noteData = JSON.parse(decodeURIComponent(name));
+                if (noteData.title === title) {
+                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
                 }
-
-                noteEditor.style.display = 'none';
-                notesListView.style.display = 'block';
-
-                // Reset saveNoteBtn onclick to its original function
-                saveNoteBtn.onclick = null;
-            };
-        }
-
-        function deleteNote(noteId) {
-            const deleteConfirm = document.getElementById('delete-confirm');
-            const confirmDeleteBtn = document.getElementById('confirm-delete');
-            const cancelBtn = deleteConfirm.querySelector('.cancel');
-
-            deleteConfirm.style.display = 'block';
-
-            confirmDeleteBtn.onclick = () => {
-                document.cookie = `${noteId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-                const li = Array.from(notesList.children).find(li => li.dataset.noteId === noteId);
-                if (li) li.remove();
-                deleteConfirm.style.display = 'none';
-                noteDetail.style.display = 'none';
-                notesListView.style.display = 'block';
-            };
-
-            cancelBtn.onclick = () => {
-                deleteConfirm.style.display = 'none';
-            };
-        }
-
-        fileInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    if (file.type.startsWith('image/')) {
-                        noteContent.value += `<img src="${e.target.result}" alt="${file.name}">`;
-                    } else if (file.type.startsWith('video/')) {
-                        noteContent.value += `<video controls><source src="${e.target.result}" type="${file.type}"></video>`;
-                    } else if (file.type.startsWith('audio/')) {
-                        noteContent.value += `<audio controls><source src="${e.target.result}" type="${file.type}"></audio>`;
-                    } else if (file.type === 'application/pdf') {
-                        noteContent.value += `<embed src="${e.target.result}" type="application/pdf" width="100%" height="600px">`;
-                    } else {
-                        noteContent.value += `<a href="${e.target.result}" download="${file.name}">${file.name}</a>`;
-                    }
-                };
-                reader.readAsDataURL(file);
             });
+            loadNotes();
+            showListView();
         });
 
-        backToListMainBtn.addEventListener('click', () => {
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'block';
-        });
+        document.addEventListener('DOMContentLoaded', loadNotes);
     </script>
 </body>
 </html>
