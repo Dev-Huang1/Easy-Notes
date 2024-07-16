@@ -346,12 +346,31 @@
     li.dataset.noteId = noteId;
     const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
     const categoryTag = noteData.category ? `<span class="category-tag ${categoryClass}">${noteData.category}</span>` : '';
-    li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${noteData.content.substring(0, 50)}</div>`;
+
+    let fileTypeTags = '';
+    if (noteData.files && noteData.files.length > 0) {
+        const hasImage = noteData.files.some(file => file.content.startsWith('data:image'));
+        const hasVideo = noteData.files.some(file => file.content.startsWith('data:video'));
+        const hasOtherFile = noteData.files.some(file => !file.content.startsWith('data:image') && !file.content.startsWith('data:video'));
+
+        if (hasImage) {
+            fileTypeTags += '[Image] ';
+        }
+        if (hasVideo) {
+            fileTypeTags += '[Video] ';
+        }
+        if (hasOtherFile) {
+            fileTypeTags += '[File] ';
+        }
+    }
+
+    li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
     li.addEventListener('click', () => {
         showNoteDetail(noteId, noteData);
     });
     return li;
 }
+
 
         function saveNote() {
             const noteData = {
