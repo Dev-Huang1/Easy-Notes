@@ -499,31 +499,36 @@
 
         function checkCookieConsent() {
     const cookies = document.cookie.split(';');
-    const consentCookie = cookies.find(cookie => cookie.trim().startsWith('cookie_consent='));
-
-    if (!consentCookie) {
-        document.getElementById('cookie-consent').style.display = 'flex';
+    consfunction checkCookieConsent() {
+        const consentCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('cookie_consent='));
+        if (consentCookie) {
+            const consentValue = consentCookie.split('=')[1];
+            if (consentValue === 'true') {
+                document.getElementById('cookie-consent').style.display = 'none';
+                loadNotes();
+            }
+        } else {
+            document.getElementById('cookie-consent').style.display = 'flex';
+        }
     }
-}
 
-function handleCookieConsent(consent) {
-    if (consent) {
-        document.cookie = `cookie_consent=true; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
-        document.getElementById('cookie-consent').style.display = 'none';
-    } else {
-        window.close();
+    function handleCookieConsent(consent) {
+        if (consent) {
+            document.cookie = `cookie_consent=true; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
+            document.getElementById('cookie-consent').style.display = 'none';
+            loadNotes();
+        } else {
+            document.cookie = `cookie_consent=false; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
+            window.close();
+        }
     }
-}
 
-document.getElementById('accept-cookies').addEventListener('click', () => handleCookieConsent(true));
-document.getElementById('decline-cookies').addEventListener('click', () => handleCookieConsent(false));
+    document.getElementById('accept-cookies').addEventListener('click', () => handleCookieConsent(true));
+    document.getElementById('decline-cookies').addEventListener('click', () => handleCookieConsent(false));
 
-checkCookieConsent();
-
-        document.addEventListener('DOMContentLoaded', () => {
-    const cookieConsent = document.getElementById('cookie-consent');
-    const acceptCookiesBtn = document.getElementById('accept-cookies');
-    const declineCookiesBtn = document.getElementById('decline-cookies');
+    document.addEventListener('DOMContentLoaded', () => {
+        checkCookieConsent();
+    });
 
     // Check if the user has already consented to cookies
     if (document.cookie.split(';').some((item) => item.trim().startsWith('cookie_consent='))) {
