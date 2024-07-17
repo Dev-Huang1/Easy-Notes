@@ -97,7 +97,8 @@
     #editor-toolbar > button {
         margin: 10px 0; /* 垂直方向上的间距 */
     }
-
+}
+        
     #upload-and-back {
         display: flex;
         flex-direction: row;
@@ -292,22 +293,18 @@
         <textarea id="note-content"></textarea>
         <div id="image-previews" class="image-preview-container"></div>
         <div id="editor-toolbar">
-    <div>
-        <input type="file" id="file-input" multiple>
-        <button onclick="document.getElementById('file-input').click()">Upload</button>
-    </div>
-    <select id="note-category">
-        <option value="">Choose category</option>
-        <option value="Work">Work</option>
-        <option value="Personal">Personal</option>
-        <option value="Learn">Learn</option>
-    </select>
-    <button id="save-note-btn">Save</button>
-    <div id="upload-and-back">
-        <button onclick="document.getElementById('file-input').click()">Upload</button>
-        <button id="back-to-list-main">Back to List</button>
-    </div>
-</div>
+            <div>
+                <input type="file" id="file-input" multiple>
+                <button onclick="document.getElementById('file-input').click()">Upload</button>
+            </div>
+            <select id="note-category">                
+                <option value="">Choose category</option>                
+                <option value="Work">Work</option>                
+                <option value="Personal">Personal</option>                
+                <option value="Learn">Learn</option>            
+            </select>
+            <button id="save-note-btn">Save</button>
+        </div>
         <button id="back-to-list-main">Back to List</button>
     </div>
     <div id="delete-confirm">
