@@ -86,7 +86,31 @@
     margin: 5px;
 }
 
-/* 新增的媒体查询部分 */
+#editor-toolbar input[type="file"] {
+    display: none;
+}
+
+#save-note-btn,
+#back-to-list-main,
+#editor-toolbar button {
+    background-color: #0066ff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+#note-category {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 16px;
+    margin-left: 5px;
+}
+
 @media (max-width: 768px) {
     #editor-toolbar {
         flex-direction: column;
@@ -95,45 +119,24 @@
 
     #editor-toolbar > div,
     #editor-toolbar > button {
-        margin: 10px 0; /* 垂直方向上的间距 */
+        flex: none;
+        margin: 10px 0;
+        width: 100%;
     }
 
-    #upload-and-back {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+    #save-note-btn,
+    #back-to-list-main,
+    #editor-toolbar button {
+        padding: 10px;
+        font-size: 14px;
+        width: 100%;
     }
 
-    #upload-and-back > button {
-        flex: 1;
-        margin: 5px;
+    #note-category {
+        width: 100%;
+        margin-left: 0;
     }
 }
-
-        #editor-toolbar input[type="file"] {
-            display: none;
-        }
-
-        #save-note-btn,
-        #back-to-list-main,
-        #editor-toolbar button {
-            background-color: #0066ff;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        #note-category {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 16px;
-            margin-left: 5px;
-        }
 
         .note-actions {
             margin-top: 10px;
