@@ -73,18 +73,32 @@
         }
 
         #editor-toolbar {
-            margin-top: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-        }
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        #editor-toolbar > div,
-        #editor-toolbar > button {
-            flex: 1;
-            margin: 5px;
-        }
+#editor-toolbar > div,
+#editor-toolbar > button {
+    flex: 1;
+    margin: 5px;
+}
+
+/* 新增的媒体查询部分 */
+@media (max-width: 768px) {
+    #editor-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #editor-toolbar > div,
+    #editor-toolbar > button {
+        margin: 10px 0; /* 垂直方向上的间距 */
+    }
+}
+
 
         #editor-toolbar input[type="file"] {
             display: none;
