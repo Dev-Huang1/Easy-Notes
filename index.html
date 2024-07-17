@@ -257,13 +257,6 @@
     </style>
 </head>
 <body>
-    <div id="cookie-consent" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-    <div style="background: white; padding: 20px; border-radius: 20px; text-align: center; max-width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <p>This site uses cookies to offer you a better browsing experience. By using this site, you consent to our use of cookies.</p>
-        <button id="accept-cookies" style="background-color: #0066ff; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer;">Accept</button>
-        <button id="decline-cookies" style="background-color: #999; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; margin-left: 10px;">Decline</button>
-    </div>
-    </div>
     <div id="notes-list">
         <h1>Easy Notes</h1>
         <input type="text" id="search-bar" placeholder="Search Notes">
@@ -497,64 +490,6 @@
         });
         backToListBtn.addEventListener('click', showNotesList);
 
-        function checkCookieConsent() {
-    const cookies = document.cookie.split(';');
-    consfunction checkCookieConsent() {
-        const consentCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('cookie_consent='));
-        if (consentCookie) {
-            const consentValue = consentCookie.split('=')[1];
-            if (consentValue === 'true') {
-                document.getElementById('cookie-consent').style.display = 'none';
-                loadNotes();
-            }
-        } else {
-            document.getElementById('cookie-consent').style.display = 'flex';
-        }
-    }
-
-    function handleCookieConsent(consent) {
-        if (consent) {
-            document.cookie = `cookie_consent=true; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
-            document.getElementById('cookie-consent').style.display = 'none';
-            loadNotes();
-        } else {
-            document.cookie = `cookie_consent=false; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
-            window.close();
-        }
-    }
-
-    document.getElementById('accept-cookies').addEventListener('click', () => handleCookieConsent(true));
-    document.getElementById('decline-cookies').addEventListener('click', () => handleCookieConsent(false));
-
-    document.addEventListener('DOMContentLoaded', () => {
-        checkCookieConsent();
-    });
-
-    // Check if the user has already consented to cookies
-    if (document.cookie.split(';').some((item) => item.trim().startsWith('cookie_consent='))) {
-        const consentValue = document.cookie.split(';').find(row => row.trim().startsWith('cookie_consent=')).split('=')[1];
-        if (consentValue === 'accepted') {
-            loadNotes();
-        } else {
-            window.close();
-        }
-    } else {
-        cookieConsent.style.display = 'flex';
-    }
-
-    acceptCookiesBtn.addEventListener('click', () => {
-        document.cookie = 'cookie_consent=accepted; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/';
-        cookieConsent.style.display = 'none';
-        loadNotes();
-    });
-
-    declineCookiesBtn.addEventListener('click', () => {
-        document.cookie = 'cookie_consent=declined; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/';
-        window.close();
-    });
-});
-
-        
         loadNotes();
 
         const imagePreviewsContainer = document.getElementById('image-previews');
