@@ -322,178 +322,326 @@
             <button id="back-to-list">Back to List</button>
         </div>
     </div>
-    <div id="cookie-consent" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; border-radius: 20px;">
-        <p style="color: white; font-size: 24px; padding: 20px;">This website uses cookies to store your notes. Please consent to cookies to continue using the website.</p>
-        <button id="accept-cookies" style="margin: 20px; padding: 10px 20px; font-size: 20px; cursor: pointer;">Accept Cookies</button>
+    <div id="cookie-consent" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+    <div style="background: white; padding: 20px; border-radius: 20px; text-align: center; width: 260px; max-width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <h2>Cookies Consent</h2>
+        <p>We use cookies to store your notes and enhance your experience on our website. By continuing to use our site, you accept our use of cookies. If you do not agree, you will not be able to use our full functionality.</p>
+        <button id="accept-cookies" style="background-color: #0066ff; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer;">Accept</button>
+        <button id="decline-cookies" style="background-color: #999; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; margin-left: 10px;">Decline</button>
     </div>
+</div>
 
     <script>
-        // Check if cookies are enabled and user has accepted cookies
-        if (!navigator.cookieEnabled || !getCookie('cookies_accepted')) {
-            document.getElementById('cookie-consent').style.display = 'flex';
-        }
+        const noteCategory = document.getElementById('note-category');
+        const searchBar = document.getElementById('search-bar');
+        const notesList = document.getElementById('notes');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const noteEditor = document.getElementById('note-editor');
+        const notesListView = document.getElementById('notes-list');
+        const saveNoteBtn = document.getElementById('save-note-btn');
+        const noteContent = document.getElementById('note-content');
+        const noteTitle = document.getElementById('note-title');
+        const fileInput = document.getElementById('file-input');
+        const noteDetail = document.getElementById('note-detail');
+        const detailTitle = document.getElementById('detail-title');
+        const detailContent = document.getElementById('detail-content');
+        const editNoteBtn = document.getElementById('edit-note');
+        const deleteNoteBtn = document.getElementById('delete-note');
+        const backToListBtn = document.getElementById('back-to-list');
+        const backToListMainBtn = document.getElementById('back-to-list-main');
 
-        // Function to get a cookie by name
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-
-        // Event listener for cookie acceptance
-        document.getElementById('accept-cookies').addEventListener('click', function() {
-            document.cookie = 'cookies_accepted=true; path=/';
-            document.getElementById('cookie-consent').style.display = 'none';
-            location.reload();
-        });
-
-        // Function to set a cookie
-        function setCookie(name, value, days) {
-            const d = new Date();
-            d.setTime(d.getTime() + (days*24*60*60*1000));
-            const expires = "expires="+ d.toUTCString();
-            document.cookie = name + "=" + value + ";" + expires + ";path=/";
-        }
-
-        // Note management logic
-        let notes = [];
-
-        // Function to save notes to cookies
-        function saveNotes() {
-            if (!navigator.cookieEnabled || !getCookie('cookies_accepted')) {
-                alert('Cookies are required to save notes.');
-                return;
-            }
-            setCookie('notes', JSON.stringify(notes), 365);
-        }
-
-        // Function to load notes from cookies
-        function loadNotes() {
-            const savedNotes = getCookie('notes');
-            if (savedNotes) {
-                notes = JSON.parse(savedNotes);
-                renderNotes();
-            }
-        }
-
-        // Function to render notes list
-        function renderNotes() {
-            const notesList = document.getElementById('notes');
-            notesList.innerHTML = '';
-            notes.forEach((note, index) => {
-                const li = document.createElement('li');
-                li.textContent = note.title;
-                li.dataset.index = index;
-                li.addEventListener('click', () => showNoteDetail(index));
-                notesList.appendChild(li);
+        searchBar.addEventListener('input', () => {
+            const searchTerm = searchBar.value.toLowerCase();
+            const notes = document.querySelectorAll('#notes li');
+        
+            notes.forEach(note => {
+                const noteText = note.textContent.toLowerCase();
+                if (noteText.includes(searchTerm)) {
+                    note.style.display = 'block';
+                } else {
+                    note.style.display = 'none';
+                }
             });
+        });
+        
+        function loadNotes() {
+    const cookies = document.cookie.split(';');
+    cookies.forEach(cookie => {
+        const [name, value] = cookie.split('=');
+        if (name.trim().startsWith('note_')) {
+            const noteData = JSON.parse(decodeURIComponent(value));
+            const li = createNoteListItem(noteData, name.trim());
+            notesList.appendChild(li);
+        }
+    });
+}
+
+
+        function createNoteListItem(noteData, noteId) {
+    const li = document.createElement('li');
+    li.dataset.noteId = noteId;
+    const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
+    const categoryTag = noteData.category ? `<span class="category-tag ${categoryClass}">${noteData.category}</span>` : '';
+
+    let fileTypeTags = '';
+    if (noteData.files && noteData.files.length > 0) {
+        const hasImage = noteData.files.some(file => file.content.startsWith('data:image'));
+        const hasVideo = noteData.files.some(file => file.content.startsWith('data:video'));
+        const hasOtherFile = noteData.files.some(file => !file.content.startsWith('data:image') && !file.content.startsWith('data:video'));
+
+        if (hasImage) {
+            fileTypeTags += '[Image] ';
+        }
+        if (hasVideo) {
+            fileTypeTags += '[Video] ';
+        }
+        if (hasOtherFile) {
+            fileTypeTags += '[File] ';
+        }
+    }
+
+    li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
+    li.addEventListener('click', () => {
+        showNoteDetail(noteId, noteData);
+    });
+    return li;
+}
+
+
+        function saveNote() {
+    const noteData = {
+        title: noteTitle.value,
+        content: noteContent.value,
+        category: noteCategory.value,
+        files: []
+    };
+
+    const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
+
+    const previewImages = imagePreviewsContainer.querySelectorAll('img');
+    previewImages.forEach(img => {
+        noteData.files.push({
+            name: img.alt,
+            content: img.src
+        });
+    });
+
+    saveNoteToCookies(noteId, noteData);
+}
+
+
+        function saveNoteToCookies(noteId, noteData) {
+    document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))}; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
+    const li = createNoteListItem(noteData, noteId);
+    const existingLi = notesList.querySelector(`li[data-note-id="${noteId}"]`);
+    if (existingLi) {
+        existingLi.replaceWith(li);
+    } else {
+        notesList.appendChild(li);
+    }
+    showNotesList();
+}
+
+            // Add this code to the existing <script> tag
+window.onload = function() {
+        if (!getCookie('cookiesAccepted')) {
+            document.getElementById('cookie-consent').style.display = 'block';
+        } else {
+            document.getElementById('cookie-consent').style.display = 'none';
+        }
+    }
+
+    // Get cookie value by name
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Set cookie
+    function setCookie(name, value, days) {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+    }
+
+    // Accept cookies
+    document.getElementById('accept-cookies').addEventListener('click', () => {
+        setCookie('cookiesAccepted', 'true', 365);
+        document.getElementById('cookie-consent').style.display = 'none';
+    });
+
+    // Decline cookies
+    document.getElementById('decline-cookies').addEventListener('click', () => {
+        window.close();
+    });
+
+        
+        function showNotesList() {
+            noteEditor.style.display = 'none';
+            notesListView.style.display = 'block';
+            noteDetail.style.display = 'none';
+            searchBar.style.display = 'block';
         }
 
-        // Event listeners for add note button
-        document.getElementById('add-note-btn').addEventListener('click', () => {
-            document.getElementById('notes-list').style.display = 'none';
-            document.getElementById('note-editor').style.display = 'block';
-        });
+        function showNoteEditor(noteId = null, noteData = null) {
+            noteTitle.dataset.noteId = noteId || '';
+            noteTitle.value = noteData?.title || '';
+            noteContent.value = noteData?.content || '';
+            noteCategory.value = noteData?.category || '';
+            noteEditor.style.display = 'block';
+            notesListView.style.display = 'none';
+            noteDetail.style.display = 'none';
+            searchBar.style.display = 'none';
+        }
 
-        // Event listeners for save note button
-        document.getElementById('save-note-btn').addEventListener('click', () => {
-            const title = document.getElementById('note-title').value;
-            const content = document.getElementById('note-content').value;
-            const category = document.getElementById('note-category').value;
-            if (title && content) {
-                notes.push({ title, content, category });
-                saveNotes();
-                document.getElementById('note-title').value = '';
-                document.getElementById('note-content').value = '';
-                document.getElementById('note-category').value = '';
-                document.getElementById('note-editor').style.display = 'none';
-                document.getElementById('notes-list').style.display = 'block';
-                renderNotes();
+        function showNoteDetail(noteId, noteData) {
+    detailTitle.textContent = noteData.title;
+    detailContent.innerHTML = noteData.content.replace(/\n/g, '<br>');
+    detailContent.innerHTML += '<br>';  // Add a line break for separation
+
+    if (noteData.files) {
+        noteData.files.forEach(file => {
+            const fileTag = document.createElement('div');
+            if (file.content.startsWith('data:image')) {
+                const img = document.createElement('img');
+                img.src = file.content;
+                img.alt = file.name;
+                fileTag.appendChild(img);
+            } else if (file.content.startsWith('data:video')) {
+                fileTag.textContent = '[Video]';
             } else {
-                alert('Title and content are required.');
+                fileTag.textContent = '[File]';
             }
+            detailContent.appendChild(fileTag);
         });
+    }
 
-        // Event listeners for back to list button
-        document.getElementById('back-to-list-main').addEventListener('click', () => {
-            document.getElementById('note-editor').style.display = 'none';
-            document.getElementById('notes-list').style.display = 'block';
-        });
+    noteDetail.dataset.noteId = noteId;
+    noteEditor.style.display = 'none';
+    notesListView.style.display = 'none';
+    noteDetail.style.display = 'block';
+    searchBar.style.display = 'none';
+}
 
-        // Event listeners for back to list button in detail view
-        document.getElementById('back-to-list').addEventListener('click', () => {
-            document.getElementById('note-detail').style.display = 'none';
-            document.getElementById('notes-list').style.display = 'block';
-        });
-
-        // Function to show note detail
-        function showNoteDetail(index) {
-            const note = notes[index];
-            document.getElementById('detail-title').textContent = note.title;
-            document.getElementById('detail-content').innerHTML = note.content;
-            document.getElementById('note-detail').style.display = 'block';
-            document.getElementById('notes-list').style.display = 'none';
-            document.getElementById('edit-note').dataset.index = index;
-            document.getElementById('delete-note').dataset.index = index;
+        function deleteNote() {
+            const noteId = noteDetail.dataset.noteId;
+            document.cookie = `${noteId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+            const noteLi = notesList.querySelector(`li[data-note-id="${noteId}"]`);
+            if (noteLi) {
+                noteLi.remove();
+            }
+            document.getElementById('delete-confirm').style.display = 'none';
+            showNotesList();
         }
 
-        // Event listeners for edit note button
-        document.getElementById('edit-note').addEventListener('click', (event) => {
-            const index = event.target.dataset.index;
-            const note = notes[index];
-            document.getElementById('note-title').value = note.title;
-            document.getElementById('note-content').value = note.content;
-            document.getElementById('note-category').value = note.category;
-            document.getElementById('note-detail').style.display = 'none';
-            document.getElementById('note-editor').style.display = 'block';
-            notes.splice(index, 1);
+        addNoteBtn.addEventListener('click', () => showNoteEditor());
+        saveNoteBtn.addEventListener('click', saveNote);
+        backToListMainBtn.addEventListener('click', showNotesList);
+        editNoteBtn.addEventListener('click', () => {
+            const noteId = noteDetail.dataset.noteId;
+            const cookies = document.cookie.split(';');
+            let noteData = null;
+            cookies.forEach(cookie => {
+                const [name, value] = cookie.split('=');
+                if (name.trim() === noteId) {
+                    noteData = JSON.parse(decodeURIComponent(value));
+                }
+            });
+            showNoteEditor(noteId, noteData);
         });
-
-        // Event listeners for delete note button
-        document.getElementById('delete-note').addEventListener('click', (event) => {
-            const index = event.target.dataset.index;
+        deleteNoteBtn.addEventListener('click', () => {
             document.getElementById('delete-confirm').style.display = 'block';
-            document.getElementById('confirm-delete').dataset.index = index;
         });
-
-        // Event listeners for delete confirm button
-        document.getElementById('confirm-delete').addEventListener('click', (event) => {
-            const index = event.target.dataset.index;
-            notes.splice(index, 1);
-            saveNotes();
-            document.getElementById('delete-confirm').style.display = 'none';
-            document.getElementById('note-detail').style.display = 'none';
-            document.getElementById('notes-list').style.display = 'block';
-            renderNotes();
-        });
-
-        // Event listeners for cancel delete button
+        document.getElementById('confirm-delete').addEventListener('click', deleteNote);
         document.querySelector('#delete-confirm .cancel').addEventListener('click', () => {
             document.getElementById('delete-confirm').style.display = 'none';
         });
+        backToListBtn.addEventListener('click', showNotesList);
 
-        // Event listener for search bar
-        document.getElementById('search-bar').addEventListener('input', (event) => {
-            const query = event.target.value.toLowerCase();
-            const filteredNotes = notes.filter(note => note.title.toLowerCase().includes(query));
-            renderFilteredNotes(filteredNotes);
-        });
+        loadNotes();
 
-        // Function to render filtered notes
-        function renderFilteredNotes(filteredNotes) {
-            const notesList = document.getElementById('notes');
-            notesList.innerHTML = '';
-            filteredNotes.forEach((note, index) => {
-                const li = document.createElement('li');
-                li.textContent = note.title;
-                li.dataset.index = index;
-                li.addEventListener('click', () => showNoteDetail(index));
-                notesList.appendChild(li);
+        const imagePreviewsContainer = document.getElementById('image-previews');
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (function(file) {
+                    return function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = file.name;
+                        img.classList.add('draggable');
+                        
+                        const imgContainer = document.createElement('div');
+                        imgContainer.classList.add('image-preview');
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = '×';
+                        deleteBtn.classList.add('delete-image');
+                        deleteBtn.addEventListener('click', function() {
+                            imgContainer.remove();
+                        });
+
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(deleteBtn);
+                        imagePreviewsContainer.appendChild(imgContainer);
+                        
+                        // Make image draggable
+                        makeDraggable(imgContainer);
+                    };
+                })(file);
+                reader.readAsDataURL(file);
             });
         }
 
-        // Load notes on page load
-        loadNotes();
+        function makeDraggable(element) {
+            element.addEventListener('dragstart', handleDragStart, false);
+            element.addEventListener('dragover', handleDragOver, false);
+            element.addEventListener('drop', handleDrop, false);
+        }
+
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault(); // Necessary. Allows us to drop.
+            }
+            e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation(); // Stops some browsers from redirecting.
+            }
+
+            // Don't do anything if dropping the same image we're dragging.
+            if (draggedElement != this) {
+                const parent = this.parentNode;
+                parent.insertBefore(draggedElement, this.nextSibling);
+            }
+
+            return false;
+        }
+        
+        // Ensure draggable elements are correctly marked
+        function updateDraggableElements() {
+            const previews = imagePreviewsContainer.querySelectorAll('.image-preview');
+            previews.forEach(preview => {
+                makeDraggable(preview);
+            });
+        }
+
+        // Call updateDraggableElements initially and whenever the DOM changes
+        updateDraggableElements();
     </script>
 </body>
 </html>
