@@ -497,6 +497,30 @@
         });
         backToListBtn.addEventListener('click', showNotesList);
 
+        function checkCookieConsent() {
+    const cookies = document.cookie.split(';');
+    const consentCookie = cookies.find(cookie => cookie.trim().startsWith('cookie_consent='));
+
+    if (!consentCookie) {
+        document.getElementById('cookie-consent').style.display = 'flex';
+    }
+}
+
+function handleCookieConsent(consent) {
+    if (consent) {
+        document.cookie = `cookie_consent=true; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
+        document.getElementById('cookie-consent').style.display = 'none';
+    } else {
+        window.close();
+    }
+}
+
+document.getElementById('accept-cookies').addEventListener('click', () => handleCookieConsent(true));
+document.getElementById('decline-cookies').addEventListener('click', () => handleCookieConsent(false));
+
+checkCookieConsent();
+
+        
         loadNotes();
 
         const imagePreviewsContainer = document.getElementById('image-previews');
