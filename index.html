@@ -416,11 +416,11 @@
 }
 
             // Add this code to the existing <script> tag
-
-    // Check for cookie consent
-    window.onload = function() {
+window.onload = function() {
         if (!getCookie('cookiesAccepted')) {
             document.getElementById('cookie-consent').style.display = 'block';
+        } else {
+            document.getElementById('cookie-consent').style.display = 'none';
         }
     }
 
