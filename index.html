@@ -254,6 +254,25 @@
         .draggable {
             cursor: move;
         }
+
+            /* Add this CSS to the existing <style> tag */
+
+    #cookie-consent {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    #cookie-consent p {
+        margin-bottom: 20px;
+    }
+
     </style>
 </head>
 <body>
@@ -295,6 +314,11 @@
             <button id="delete-note">Delete</button>
             <button id="back-to-list">Back to List</button>
         </div>
+    </div>
+    <div id="cookie-consent" style="display: none;">
+        <p>We use cookies to ensure you get the best experience on our website.</p>
+        <button id="accept-cookies" style="border-radius: 20px; background-color: #0066ff; color: white; padding: 10px 20px; cursor: pointer;">Accept</button>
+        <button id="decline-cookies" style="border-radius: 20px; background-color: #0066ff; color: white; padding: 10px 20px; cursor: pointer;">Decline</button>
     </div>
     <script>
         const noteCategory = document.getElementById('note-category');
@@ -407,7 +431,40 @@
     showNotesList();
 }
 
+            // Add this code to the existing <script> tag
 
+    // Check for cookie consent
+    window.onload = function() {
+        if (!getCookie('cookiesAccepted')) {
+            document.getElementById('cookie-consent').style.display = 'block';
+        }
+    }
+
+    // Get cookie value by name
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Set cookie
+    function setCookie(name, value, days) {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+    }
+
+    // Accept cookies
+    document.getElementById('accept-cookies').addEventListener('click', () => {
+        setCookie('cookiesAccepted', 'true', 365);
+        document.getElementById('cookie-consent').style.display = 'none';
+    });
+
+    // Decline cookies
+    document.getElementById('decline-cookies').addEventListener('click', () => {
+        window.close();
+    });
+
+        
         function showNotesList() {
             noteEditor.style.display = 'none';
             notesListView.style.display = 'block';
