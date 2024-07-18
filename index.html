@@ -439,7 +439,7 @@
 
         const formattedTime = formatTime(noteData.lastModified);
 
-        li.innerHTML = `${formattedTime} <strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
+        li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${formattedTime} ${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
         li.addEventListener('click', () => {
             showNoteDetail(noteId, noteData);
         });
@@ -508,7 +508,7 @@
         document.getElementById('loading-page').style.display = 'none';
     }, 3500);
 
-    loadNotes();
+    // loadNotes();
 }
 
 
