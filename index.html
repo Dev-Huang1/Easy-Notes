@@ -415,48 +415,36 @@
 
 
         function createNoteListItem(noteData, noteId) {
-    const li =function createNoteListItem(noteData, noteId) {
-    const li = document.createElement('li');
-    li.dataset.noteId = noteId;
-    const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
-    const categoryTag = noteData.category ? `<span class="category-tag ${categoryClass}">${noteData.category}</span>` : '';
+        const li = document.createElement('li');
+        li.dataset.noteId = noteId;
+        const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
+        const categoryTag = noteData.category ? `<span class="category-tag ${categoryClass}">${noteData.category}</span>` : '';
 
-    let fileTypeTags = '';
-    if (noteData.files && noteData.files.length > 0) {
-        const hasImage = noteData.files.some(file => file.content.startsWith('data:image'));
-        const hasVideo = noteData.files.some(file => file.content.startsWith('data:video'));
-        const hasOtherFile = noteData.files.some(file => !file.content.startsWith('data:image') && !file.content.startsWith('data:video'));
+        let fileTypeTags = '';
+        if (noteData.files && noteData.files.length > 0) {
+            const hasImage = noteData.files.some(file => file.content.startsWith('data:image'));
+            const hasVideo = noteData.files.some(file => file.content.startsWith('data:video'));
+            const hasOtherFile = noteData.files.some(file => !file.content.startsWith('data:image') && !file.content.startsWith('data:video'));
 
-        if (hasImage) {
-            fileTypeTags += '[Image] ';
+            if (hasImage) {
+                fileTypeTags += '[Image] ';
+            }
+            if (hasVideo) {
+                fileTypeTags += '[Video] ';
+            }
+            if (hasOtherFile) {
+                fileTypeTags += '[File] ';
+            }
         }
-        if (hasVideo) {
-            fileTypeTags += '[Video] ';
-        }
-        if (hasOtherFile) {
-            fileTypeTags += '[File] ';
-        }
+
+        const formattedTime = formatTime(noteData.lastModified);
+
+        li.innerHTML = `${formattedTime} <strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
+        li.addEventListener('click', () => {
+            showNoteDetail(noteId, noteData);
+        });
+        return li;
     }
-
-    const lastModified = noteData.lastModified ? new Date(noteData.lastModified) : new Date();
-    const now = new Date();
-    let formattedDate;
-
-    if (lastModified.toDateString() === now.toDateString()) {
-        formattedDate = lastModified.toTimeString().split(' ')[0].substring(0, 5); // 时:分
-    } else {
-        formattedDate = lastModified.toISOString().split('T')[0]; // 年-月-日
-    }
-
-    li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${formattedDate} | ${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
-    li.addEventListener('click', () => {
-        showNoteDetail(noteId, noteData);
-    });
-    return li;
-}
-
-
-
 
         function saveNote() {
         const noteData = {
@@ -480,6 +468,23 @@
         saveNoteToCookies(noteId, noteData);
     }
 
+        function formatTime(isoString) {
+        const date = new Date(isoString);
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+
+        if (isToday) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes} |`;
+        } else {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day} |`;
+        }
+        }
+        
         function saveNoteToCookies(noteId, noteData) {
     document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))}; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
     const li = createNoteListItem(noteData, noteId);
