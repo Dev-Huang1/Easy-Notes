@@ -402,6 +402,7 @@
         const [name, value] = cookie.split('=');
         if (name.trim().startsWith('note_')) {
             const noteData = JSON.parse(decodeURIComponent(value));
+            noteData.lastModified = new Date(noteData.lastModified); // 确保解析为日期对象
             const li = createNoteListItem(noteData, name.trim());
             notesList.appendChild(li);
         }
@@ -409,7 +410,9 @@
 }
 
 
+
         function createNoteListItem(noteData, noteId) {
+    const li =function createNoteListItem(noteData, noteId) {
     const li = document.createElement('li');
     li.dataset.noteId = noteId;
     const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
@@ -432,7 +435,17 @@
         }
     }
 
-    li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
+    const lastModified = new Date(noteData.lastModified);
+    const now = new Date();
+    let formattedDate;
+
+    if (lastModified.toDateString() === now.toDateString()) {
+        formattedDate = lastModified.toTimeString().split(' ')[0].substring(0, 5); // 时:分
+    } else {
+        formattedDate = lastModified.toISOString().split('T')[0]; // 年-月-日
+    }
+
+    li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${formattedDate} | ${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
     li.addEventListener('click', () => {
         showNoteDetail(noteId, noteData);
     });
@@ -440,12 +453,14 @@
 }
 
 
+
         function saveNote() {
     const noteData = {
         title: noteTitle.value,
         content: noteContent.value,
         category: noteCategory.value,
-        files: []
+        files: [],
+        lastModified: new Date()  // 新增字段
     };
 
     const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
@@ -460,7 +475,6 @@
 
     saveNoteToCookies(noteId, noteData);
 }
-
 
         function saveNoteToCookies(noteId, noteData) {
     document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))}; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
