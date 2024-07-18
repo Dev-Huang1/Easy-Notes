@@ -1,6 +1,6 @@
 <div align="center">
 
-![Air Notes Banner](assets/images/banner.png)
+<!--![Air Notes Banner](assets/images/banner.png)-->
 
 # Easy Notes
 
