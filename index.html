@@ -281,9 +281,25 @@
         .draggable {
             cursor: move;
         }
+
+        #loading-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
     </style>
 </head>
 <body>
+    <div id="loading-page" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+        <img src="assets/images/Easy-Notes-Logo.png" alt="Logo" style="width: 100px; height: 100px;">
+    </div>
     <div id="notes-list">
         <h1>Easy Notes</h1>
         <input type="text" id="search-bar" placeholder="Search Notes">
@@ -444,14 +460,19 @@
     showNotesList();
 }
 
-            // Add this code to the existing <script> tag
-window.onload = function() {
-        if (!getCookie('cookiesAccepted')) {
-            document.getElementById('cookie-consent').style.display = 'block';
-        } else {
-            document.getElementById('cookie-consent').style.display = 'none';
-        }
+            window.onload = function() {
+    if (!getCookie('cookiesAccepted')) {
+        document.getElementById('cookie-consent').style.display = 'block';
+    } else {
+        document.getElementById('cookie-consent').style.display = 'none';
     }
+
+    // 显示等待页面
+    setTimeout(() => {
+        document.getElementById('loading-page').style.display = 'none';
+    }, 5000); // 5秒后隐藏等待页面
+}
+
 
     // Get cookie value by name
     function getCookie(name) {
