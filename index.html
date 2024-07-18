@@ -402,12 +402,15 @@
         const [name, value] = cookie.split('=');
         if (name.trim().startsWith('note_')) {
             const noteData = JSON.parse(decodeURIComponent(value));
-            noteData.lastModified = new Date(noteData.lastModified); // 确保解析为日期对象
+            if (!noteData.lastModified) {
+                noteData.lastModified = new Date().toISOString(); // 设置默认值
+            }
             const li = createNoteListItem(noteData, name.trim());
             notesList.appendChild(li);
         }
     });
 }
+
 
 
 
@@ -435,7 +438,7 @@
         }
     }
 
-    const lastModified = new Date(noteData.lastModified);
+    const lastModified = noteData.lastModified ? new Date(noteData.lastModified) : new Date();
     const now = new Date();
     let formattedDate;
 
@@ -454,13 +457,14 @@
 
 
 
+
         function saveNote() {
     const noteData = {
         title: noteTitle.value,
         content: noteContent.value,
         category: noteCategory.value,
         files: [],
-        lastModified: new Date()  // 新增字段
+        lastModified: new Date().toISOString()  // 新增字段，确保保存为 ISO 字符串
     };
 
     const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
@@ -497,8 +501,11 @@
 
     setTimeout(() => {
         document.getElementById('loading-page').style.display = 'none';
-    }, 3500); 
+    }, 3500);
+
+    loadNotes();
 }
+
 
 
     // Get cookie value by name
