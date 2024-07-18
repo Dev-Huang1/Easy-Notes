@@ -294,17 +294,25 @@
     align-items: center;
     z-index: 9999;
 }
+        .from-tech-art-container {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+        }
 
         .from-tech-art {
             width: 100px;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div id="loading-page" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <img src="/assets/images/Easy-Notes-Logo.png" alt="Logo" style="width: 200px; height: 200px;">
-        <img src="/assets/images/from-tech-art.png" alt="from Tech-Art" class="from-tech-art">
+        <div class="from-tech-art-container">
+            <img src="/assets/images/from-tech-art.png" alt="from Tech-Art" class="from-tech-art">
+        </div>
     </div>
     <div id="notes-list">
         <h1>Easy Notes</h1>
