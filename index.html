@@ -459,26 +459,26 @@
 
 
         function saveNote() {
-    const noteData = {
-        title: noteTitle.value,
-        content: noteContent.value,
-        category: noteCategory.value,
-        files: [],
-        lastModified: new Date().toISOString()  // 新增字段，确保保存为 ISO 字符串
-    };
+        const noteData = {
+            title: noteTitle.value,
+            content: noteContent.value,
+            category: noteCategory.value,
+            files: [],
+            lastModified: new Date().toISOString()  // 记录最后修改时间
+        };
 
-    const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
+        const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
 
-    const previewImages = imagePreviewsContainer.querySelectorAll('img');
-    previewImages.forEach(img => {
-        noteData.files.push({
-            name: img.alt,
-            content: img.src
+        const previewImages = imagePreviewsContainer.querySelectorAll('img');
+        previewImages.forEach(img => {
+            noteData.files.push({
+                name: img.alt,
+                content: img.src
+            });
         });
-    });
 
-    saveNoteToCookies(noteId, noteData);
-}
+        saveNoteToCookies(noteId, noteData);
+    }
 
         function saveNoteToCookies(noteId, noteData) {
     document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))}; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
