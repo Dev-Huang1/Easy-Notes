@@ -10,7 +10,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f4f8;
+            background-color: f0f4f8;
         }
 
         #notes-list {
@@ -73,70 +73,70 @@
         }
 
         #editor-toolbar {
-    margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-}
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-#editor-toolbar > div,
-#editor-toolbar > button {
-    flex: 1;
-    margin: 5px;
-}
+        #editor-toolbar > div,
+        #editor-toolbar > button {
+            flex: 1;
+            margin: 5px;
+        }
 
-#editor-toolbar input[type="file"] {
-    display: none;
-}
+        #editor-toolbar input[type="file"] {
+            display: none;
+        }
 
-#save-note-btn,
-#back-to-list-main,
-#editor-toolbar button {
-    background-color: #0066ff;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    margin: 5px 0;
-}
+        #save-note-btn,
+        #back-to-list-main,
+        #editor-toolbar button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px 0;
+        }
 
-#note-category {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    font-size: 16px;
-    margin-left: 5px;
-}
+        #note-category {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+            margin-left: 5px;
+        }
 
-@media (max-width: 768px) {
-    #editor-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
+        @media (max-width: 768px) {
+            #editor-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
 
-    #editor-toolbar > div,
-    #editor-toolbar > button {
-        flex: none;
-        margin: 10px 0;
-        width: 100%;
-    }
+            #editor-toolbar > div,
+            #editor-toolbar > button {
+                flex: none;
+                margin: 10px 0;
+                width: 100%;
+             }
 
-    #save-note-btn,
-    #back-to-list-main,
-    #editor-toolbar button {
-        padding: 10px;
-        font-size: 14px;
-        width: 100%;
-    }
+             #save-note-btn,
+             #back-to-list-main,
+             #editor-toolbar button {
+                 padding: 10px;
+                 font-size: 14px;
+                 width: 100%;
+             }
 
-    #note-category {
-        width: 100%;
-        margin-left: 0;
-    }
-}
+             #note-category {
+                 width: 100%;
+                 margin-left: 0;
+             }
+        }
 
         .note-actions {
             margin-top: 10px;
@@ -200,12 +200,12 @@
         }
 
         .category-tag {
-    padding: 2px 8px;
-    margin-right: 5px;
-    border-radius: 3px;
-    font-size: 12px;
-    color: white; /* Text color for all categories */
-}
+            padding: 2px 8px;
+            margin-right: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: white; 
+        }
 
 .category-work {
     background-color: #0066ff; /* Blue for Work */
@@ -321,26 +321,24 @@
         <button id="add-note-btn">+</button>
     </div>
     <div id="note-editor" style="display: none;">
-    <input type="text" id="note-title" placeholder="Note Title">
-    <textarea id="note-content"></textarea>
-    <div id="image-previews" class="image-preview-container"></div>
-    <div id="editor-toolbar">
-        <div>
-            <input type="file" id="file-input" multiple>
-            <button onclick="document.getElementById('file-input').click()">Upload</button>
+        <input type="text" id="note-title" placeholder="Note Title">
+        <textarea id="note-content"></textarea>
+        <div id="image-previews" class="image-preview-container"></div>
+        <div id="editor-toolbar">
+            <div>
+                <input type="file" id="file-input" multiple>
+                <button onclick="document.getElementById('file-input').click()">Upload</button>
+            </div>
+            <select id="note-category">                
+                <option value="">Choose category</option>                
+                <option value="Work">Work</option>                
+                <option value="Personal">Personal</option>                
+                <option value="Learn">Learn</option>            
+            </select>
+            <button id="save-note-btn">Save</button>
         </div>
-        <select id="note-category">                
-            <option value="">Choose category</option>                
-            <option value="Work">Work</option>                
-            <option value="Personal">Personal</option>                
-            <option value="Learn">Learn</option>            
-        </select>
-        <button id="undo-btn" style="position: absolute; top: 10px; right: 110px;">回撤</button>
-        <button id="redo-btn" style="position: absolute; top: 10px; right: 60px;">撤销</button>
-        <button id="save-note-btn" style="position: absolute; top: 10px; right: 10px;">✔</button>
+        <button id="back-to-list-main">Back to List</button>
     </div>
-    <button id="back-to-list-main" style="position: absolute; top: 10px; left: 10px;">←</button>
-</div>
     <div id="delete-confirm">
         <p>Are you sure you want to delete this note?</p>
         <button id="confirm-delete">Delete</button>
@@ -413,13 +411,7 @@
     });
 }
 
-document.getElementById('undo-btn').addEventListener('click', () => {
-    document.execCommand('undo');
-});
 
-document.getElementById('redo-btn').addEventListener('click', () => {
-    document.execCommand('redo');
-});
 
 
         function createNoteListItem(noteData, noteId) {
