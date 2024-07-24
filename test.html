@@ -210,18 +210,17 @@
             color: white; 
         }
 
-.category-work {
-    background-color: #0066ff; /* Blue for Work */
-}
+        .category-work {
+            background-color: #0066ff; /* Blue for Work */
+        }
 
-.category-personal {
-    background-color: #66cc66; /* Light green for Personal */
-}
+        .category-personal {
+            background-color: #66cc66; /* Light green for Personal */
+        }
 
-.category-learn {
-    background-color: #ffd700; /* Light yellow for Learn */
-}
-
+        .category-learn {
+            background-color: #ffd700; /* Light yellow for Learn */
+        }
 
         .note-preview {
             white-space: nowrap;
@@ -286,23 +285,24 @@
         }
 
         #loading-page {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
         .from-tech-art-container {
-    position: absolute;
-    bottom: 50px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
         .from-tech-art {
@@ -339,387 +339,255 @@
     <div id="note-editor" style="display: none;">
         <input type="text" id="note-title" placeholder="Note Title">
         <textarea id="note-content"></textarea>
-        <div id="image-previews" class="image-preview-container"></div>
         <div id="editor-toolbar">
             <div>
-                <input type="file" id="file-input" multiple>
-                <button onclick="document.getElementById('file-input').click()">Upload</button>
+                <label for="note-category">Category:</label>
+                <select id="note-category">
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="learn">Learn</option>
+                </select>
             </div>
-            <select id="note-category">                
-                <option value="">Choose category</option>                
-                <option value="Work">Work</option>                
-                <option value="Personal">Personal</option>                
-                <option value="Learn">Learn</option>            
-            </select>
-            <button id="save-note-btn">Save</button>
+            <div>
+                <button type="button" onclick="document.getElementById('file-upload').click()">Upload Image</button>
+                <input type="file" id="file-upload" accept="image/*" multiple>
+                <div class="image-preview-container" id="image-preview-container"></div>
+            </div>
+            <div>
+                <button onclick="document.execCommand('bold', false, '');">Bold</button>
+                <button onclick="document.execCommand('italic', false, '');">Italic</button>
+                <button onclick="document.execCommand('underline', false, '');">Underline</button>
+                <button onclick="document.execCommand('justifyCenter', false, '');">Center</button>
+                <input type="color" id="color-picker" value="#000000">
+                <button onclick="changeTextColor();">Change Text Color</button>
+            </div>
+            <div>
+                <button id="save-note-btn">Save</button>
+                <button id="back-to-list-main">Back</button>
+            </div>
         </div>
-        <button id="back-to-list-main">Back to List</button>
+    </div>
+    <div id="note-detail">
+        <button id="back-to-list">返回</button>
+        <h2 id="detail-title"></h2>
+        <div id="detail-content"></div>
+        <div id="detail-category"></div>
+        <div class="image-preview-container" id="detail-image-container"></div>
+        <div class="note-actions">
+            <button id="edit-note-btn">Edit</button>
+            <button id="delete-note-btn">Delete</button>
+        </div>
     </div>
     <div id="delete-confirm">
         <p>Are you sure you want to delete this note?</p>
-        <button id="confirm-delete">Delete</button>
-        <button class="cancel">Cancel</button>
+        <button id="confirm-delete-btn">Yes</button>
+        <button class="cancel" id="cancel-delete-btn">No</button>
     </div>
-    <div id="note-detail">
-        <button id="back-to-list" onclick="showNotesList()">← Back to List</button>
-        <h2 id="detail-title"></h2>
-        <div id="detail-content"></div>
-        <div class="note-actions">
-            <button id="edit-note">Edit</button>
-            <button id="delete-note">Delete</button>
-        </div>
-    </div>
-    <div id="cookie-consent" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 20px; text-align: center; width: 260px; max-width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-            <h2>Cookies Consent</h2>
-            <p>We use cookies to store your notes and enhance your experience on our website. By continuing to use our site, you accept our use of cookies. If you do not agree, you will not be able to use our full functionality.</p>
-            <button id="accept-cookies" style="background-color: #0066ff; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer;">Accept</button>
-            <button id="decline-cookies" style="background-color: #999; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; margin-left: 10px;">Decline</button>
-        </div>
-    </div>
-
-
     <script>
-        const noteCategory = document.getElementById('note-category');
-        const searchBar = document.getElementById('search-bar');
-        const notesList = document.getElementById('notes');
-        const addNoteBtn = document.getElementById('add-note-btn');
-        const noteEditor = document.getElementById('note-editor');
-        const notesListView = document.getElementById('notes-list');
-        const saveNoteBtn = document.getElementById('save-note-btn');
-        const noteContent = document.getElementById('note-content');
-        const noteTitle = document.getElementById('note-title');
-        const fileInput = document.getElementById('file-input');
-        const noteDetail = document.getElementById('note-detail');
-        const detailTitle = document.getElementById('detail-title');
-        const detailContent = document.getElementById('detail-content');
-        const editNoteBtn = document.getElementById('edit-note');
-        const deleteNoteBtn = document.getElementById('delete-note');
-        const backToListBtn = document.getElementById('back-to-list');
-        const backToListMainBtn = document.getElementById('back-to-list-main');
+        let notes = [];
+        let currentNoteIndex = -1;
 
-        searchBar.addEventListener('input', () => {
-            const searchTerm = searchBar.value.toLowerCase();
-            const notes = document.querySelectorAll('#notes li');
-        
-            notes.forEach(note => {
-                const noteText = note.textContent.toLowerCase();
-                if (noteText.includes(searchTerm)) {
-                    note.style.display = 'block';
-                } else {
-                    note.style.display = 'none';
-                }
-            });
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("loading-page").style.display = "none";
+            document.getElementById("add-note-btn").addEventListener("click", showNoteEditor);
+            document.getElementById("save-note-btn").addEventListener("click", saveNote);
+            document.getElementById("back-to-list-main").addEventListener("click", showNotesList);
+            document.getElementById("file-upload").addEventListener("change", handleFileSelect);
+            document.getElementById("back-to-list").addEventListener("click", showNotesList);
+            document.getElementById("search-bar").addEventListener("input", searchNotes);
+            document.getElementById("edit-note-btn").addEventListener("click", editCurrentNote);
+            document.getElementById("delete-note-btn").addEventListener("click", showDeleteConfirm);
+            document.getElementById("confirm-delete-btn").addEventListener("click", deleteCurrentNote);
+            document.getElementById("cancel-delete-btn").addEventListener("click", hideDeleteConfirm);
         });
-        
-        function loadNotes() {
-    const cookies = document.cookie.split(';');
-    cookies.forEach(cookie => {
-        const [name, value] = cookie.split('=');
-        if (name.trim().startsWith('note_')) {
-            const noteData = JSON.parse(decodeURIComponent(value));
-            if (!noteData.lastModified) {
-                noteData.lastModified = new Date().toISOString(); // 设置默认值
-            }
-            const li = createNoteListItem(noteData, name.trim());
-            notesList.appendChild(li);
-        }
-    });
-}
-
-
-
-
-        function createNoteListItem(noteData, noteId) {
-        const li = document.createElement('li');
-        li.dataset.noteId = noteId;
-        const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
-        const categoryTag = noteData.category ? `<span class="category-tag ${categoryClass}">${noteData.category}</span>` : '';
-
-        let fileTypeTags = '';
-        if (noteData.files && noteData.files.length > 0) {
-            const hasImage = noteData.files.some(file => file.content.startsWith('data:image'));
-            const hasVideo = noteData.files.some(file => file.content.startsWith('data:video'));
-            const hasOtherFile = noteData.files.some(file => !file.content.startsWith('data:image') && !file.content.startsWith('data:video'));
-
-            if (hasImage) {
-                fileTypeTags += '[Image] ';
-            }
-            if (hasVideo) {
-                fileTypeTags += '[Video] ';
-            }
-            if (hasOtherFile) {
-                fileTypeTags += '[File] ';
-            }
-        }
-
-        const formattedTime = formatTime(noteData.lastModified);
-
-        li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${formattedTime} ${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
-        li.addEventListener('click', () => {
-            showNoteDetail(noteId, noteData);
-        });
-        return li;
-    }
-
-        function saveNote() {
-        const noteData = {
-            title: noteTitle.value,
-            content: noteContent.value,
-            category: noteCategory.value,
-            files: [],
-            lastModified: new Date().toISOString()  // 记录最后修改时间
-        };
-
-        const noteId = noteTitle.dataset.noteId || `note_${Date.now()}`;
-
-        const previewImages = imagePreviewsContainer.querySelectorAll('img');
-        previewImages.forEach(img => {
-            noteData.files.push({
-                name: img.alt,
-                content: img.src
-            });
-        });
-
-        saveNoteToCookies(noteId, noteData);
-    }
-
-        function formatTime(isoString) {
-        const date = new Date(isoString);
-        const now = new Date();
-        const isToday = date.toDateString() === now.toDateString();
-
-        if (isToday) {
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            return `${hours}:${minutes} |`;
-        } else {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            return `${year}-${month}-${day} |`;
-        }
-        }
-        
-        function saveNoteToCookies(noteId, noteData) {
-    document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(noteData))}; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/`;
-    const li = createNoteListItem(noteData, noteId);
-    const existingLi = notesList.querySelector(`li[data-note-id="${noteId}"]`);
-    if (existingLi) {
-        existingLi.replaceWith(li);
-    } else {
-        notesList.appendChild(li);
-    }
-    showNotesList();
-}
-
-            window.onload = function() {
-    if (!getCookie('cookiesAccepted')) {
-        document.getElementById('cookie-consent').style.display = 'block';
-    } else {
-        document.getElementById('cookie-consent').style.display = 'none';
-    }
-
-    setTimeout(() => {
-        document.getElementById('loading-page').style.display = 'none';
-    }, 3500);
-
-    // loadNotes();
-}
-
-
-
-    // Get cookie value by name
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-
-    // Set cookie
-    function setCookie(name, value, days) {
-        const expires = new Date(Date.now() + days * 864e5).toUTCString();
-        document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-    }
-
-    // Accept cookies
-    document.getElementById('accept-cookies').addEventListener('click', () => {
-        setCookie('cookiesAccepted', 'true', 365);
-        document.getElementById('cookie-consent').style.display = 'none';
-    });
-
-    // Decline cookies
-    document.getElementById('decline-cookies').addEventListener('click', () => {
-        window.close();
-    });
-
-        
-        function showNotesList() {
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'block';
-            noteDetail.style.display = 'none';
-            searchBar.style.display = 'block';
-        }
-
-        function showNoteEditor(noteId = null, noteData = null) {
-            noteTitle.dataset.noteId = noteId || '';
-            noteTitle.value = noteData?.title || '';
-            noteContent.value = noteData?.content || '';
-            noteCategory.value = noteData?.category || '';
-            noteEditor.style.display = 'block';
-            notesListView.style.display = 'none';
-            noteDetail.style.display = 'none';
-            searchBar.style.display = 'none';
-        }
-
-        function showNoteDetail(noteId, noteData) {
-    detailTitle.textContent = noteData.title;
-    detailContent.innerHTML = noteData.content.replace(/\n/g, '<br>');
-    detailContent.innerHTML += '<br>';  // Add a line break for separation
-
-    if (noteData.files) {
-        noteData.files.forEach(file => {
-            const fileTag = document.createElement('div');
-            if (file.content.startsWith('data:image')) {
-                const img = document.createElement('img');
-                img.src = file.content;
-                img.alt = file.name;
-                fileTag.appendChild(img);
-            } else if (file.content.startsWith('data:video')) {
-                fileTag.textContent = '[Video]';
-            } else {
-                fileTag.textContent = '[File]';
-            }
-            detailContent.appendChild(fileTag);
-        });
-    }
-
-    noteDetail.dataset.noteId = noteId;
-    noteEditor.style.display = 'none';
-    notesListView.style.display = 'none';
-    noteDetail.style.display = 'block';
-    searchBar.style.display = 'none';
-}
-
-        function deleteNote() {
-            const noteId = noteDetail.dataset.noteId;
-            document.cookie = `${noteId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-            const noteLi = notesList.querySelector(`li[data-note-id="${noteId}"]`);
-            if (noteLi) {
-                noteLi.remove();
-            }
-            document.getElementById('delete-confirm').style.display = 'none';
-            showNotesList();
-        }
-
-        addNoteBtn.addEventListener('click', () => showNoteEditor());
-        saveNoteBtn.addEventListener('click', saveNote);
-        backToListMainBtn.addEventListener('click', showNotesList);
-        editNoteBtn.addEventListener('click', () => {
-            const noteId = noteDetail.dataset.noteId;
-            const cookies = document.cookie.split(';');
-            let noteData = null;
-            cookies.forEach(cookie => {
-                const [name, value] = cookie.split('=');
-                if (name.trim() === noteId) {
-                    noteData = JSON.parse(decodeURIComponent(value));
-                }
-            });
-            showNoteEditor(noteId, noteData);
-        });
-        deleteNoteBtn.addEventListener('click', () => {
-            document.getElementById('delete-confirm').style.display = 'block';
-        });
-        document.getElementById('confirm-delete').addEventListener('click', deleteNote);
-        document.querySelector('#delete-confirm .cancel').addEventListener('click', () => {
-            document.getElementById('delete-confirm').style.display = 'none';
-        });
-        backToListBtn.addEventListener('click', showNotesList);
-
-        loadNotes();
-
-        const imagePreviewsContainer = document.getElementById('image-previews');
-
-        fileInput.addEventListener('change', handleFileSelect);
 
         function handleFileSelect(event) {
             const files = event.target.files;
-            Array.from(files).forEach(file => {
+            const previewContainer = document.getElementById('image-preview-container');
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
                 const reader = new FileReader();
-                reader.onload = (function(file) {
-                    return function(e) {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.alt = file.name;
-                        img.classList.add('draggable');
-                        
-                        const imgContainer = document.createElement('div');
-                        imgContainer.classList.add('image-preview');
-                        
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.textContent = '×';
-                        deleteBtn.classList.add('delete-image');
-                        deleteBtn.addEventListener('click', function() {
-                            imgContainer.remove();
-                        });
 
-                        imgContainer.appendChild(img);
-                        imgContainer.appendChild(deleteBtn);
-                        imagePreviewsContainer.appendChild(imgContainer);
-                        
-                        // Make image draggable
-                        makeDraggable(imgContainer);
+                reader.onload = function (e) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'image-preview';
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    previewDiv.appendChild(img);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-image';
+                    deleteBtn.innerHTML = 'X';
+                    deleteBtn.onclick = function () {
+                        previewContainer.removeChild(previewDiv);
                     };
-                })(file);
+                    previewDiv.appendChild(deleteBtn);
+
+                    previewContainer.appendChild(previewDiv);
+                };
+
                 reader.readAsDataURL(file);
+            }
+        }
+
+        function showNoteEditor() {
+            document.getElementById("note-editor").style.display = "block";
+            document.getElementById("notes-list").style.display = "none";
+            document.getElementById("note-detail").style.display = "none";
+            document.getElementById("note-title").value = "";
+            document.getElementById("note-content").value = "";
+            document.getElementById("note-category").value = "work";
+            document.getElementById("image-preview-container").innerHTML = "";
+            currentNoteIndex = -1;
+        }
+
+        function saveNote() {
+            const title = document.getElementById("note-title").value;
+            const content = document.getElementById("note-content").value;
+            const category = document.getElementById("note-category").value;
+            const images = Array.from(document.getElementById("image-preview-container").children).map(previewDiv => previewDiv.querySelector('img').src);
+
+            if (currentNoteIndex === -1) {
+                notes.push({ title, content, category, images });
+            } else {
+                notes[currentNoteIndex] = { title, content, category, images };
+            }
+
+            updateNotesList();
+            showNotesList();
+        }
+
+        function showNotesList() {
+            document.getElementById("note-editor").style.display = "none";
+            document.getElementById("notes-list").style.display = "block";
+            document.getElementById("note-detail").style.display = "none";
+        }
+
+        function updateNotesList() {
+            const notesUl = document.getElementById("notes");
+            notesUl.innerHTML = "";
+
+            notes.forEach((note, index) => {
+                const noteLi = document.createElement("li");
+                noteLi.onclick = () => showNoteDetail(index);
+
+                const title = document.createElement("div");
+                title.textContent = note.title;
+                noteLi.appendChild(title);
+
+                const category = document.createElement("span");
+                category.classList.add("category-tag", `category-${note.category}`);
+                category.textContent = note.category.charAt(0).toUpperCase() + note.category.slice(1);
+                noteLi.appendChild(category);
+
+                const preview = document.createElement("div");
+                preview.className = "note-preview";
+                preview.textContent = note.content;
+                noteLi.appendChild(preview);
+
+                notesUl.appendChild(noteLi);
             });
         }
 
-        function makeDraggable(element) {
-            element.addEventListener('dragstart', handleDragStart, false);
-            element.addEventListener('dragover', handleDragOver, false);
-            element.addEventListener('drop', handleDrop, false);
+        function showNoteDetail(index) {
+            const note = notes[index];
+            currentNoteIndex = index;
+
+            document.getElementById("detail-title").textContent = note.title;
+            document.getElementById("detail-content").textContent = note.content;
+            document.getElementById("detail-category").textContent = note.category;
+            document.getElementById("detail-image-container").innerHTML = note.images.map(src => `<div class="image-preview"><img src="${src}" alt="Note Image"></div>`).join("");
+
+            document.getElementById("note-editor").style.display = "none";
+            document.getElementById("notes-list").style.display = "none";
+            document.getElementById("note-detail").style.display = "block";
         }
 
-        let draggedElement = null;
+        function editCurrentNote() {
+            const note = notes[currentNoteIndex];
 
-        function handleDragStart(e) {
-            draggedElement = this;
-            e.dataTransfer.effectAllowed = 'move';
+            document.getElementById("note-title").value = note.title;
+            document.getElementById("note-content").value = note.content;
+            document.getElementById("note-category").value = note.category;
+
+            const previewContainer = document.getElementById("image-preview-container");
+            previewContainer.innerHTML = "";
+
+            note.images.forEach(src => {
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'image-preview';
+
+                const img = document.createElement('img');
+                img.src = src;
+                previewDiv.appendChild(img);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-image';
+                deleteBtn.innerHTML = 'X';
+                deleteBtn.onclick = function () {
+                    previewContainer.removeChild(previewDiv);
+                };
+                previewDiv.appendChild(deleteBtn);
+
+                previewContainer.appendChild(previewDiv);
+            });
+
+            showNoteEditor();
         }
 
-        function handleDragOver(e) {
-            if (e.preventDefault) {
-                e.preventDefault(); // Necessary. Allows us to drop.
+        function showDeleteConfirm() {
+            document.getElementById("delete-confirm").style.display = "block";
+        }
+
+        function hideDeleteConfirm() {
+            document.getElementById("delete-confirm").style.display = "none";
+        }
+
+        function deleteCurrentNote() {
+            if (currentNoteIndex > -1) {
+                notes.splice(currentNoteIndex, 1);
+                currentNoteIndex = -1;
+                updateNotesList();
+                showNotesList();
+                hideDeleteConfirm();
             }
-            e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
-            return false;
         }
 
-        function handleDrop(e) {
-            if (e.stopPropagation) {
-                e.stopPropagation(); // Stops some browsers from redirecting.
-            }
+        function searchNotes() {
+            const query = document.getElementById("search-bar").value.toLowerCase();
+            const notesUl = document.getElementById("notes");
+            notesUl.innerHTML = "";
 
-            // Don't do anything if dropping the same image we're dragging.
-            if (draggedElement != this) {
-                const parent = this.parentNode;
-                parent.insertBefore(draggedElement, this.nextSibling);
-            }
+            notes.forEach((note, index) => {
+                if (note.title.toLowerCase().includes(query) || note.content.toLowerCase().includes(query) || note.category.toLowerCase().includes(query)) {
+                    const noteLi = document.createElement("li");
+                    noteLi.onclick = () => showNoteDetail(index);
 
-            return false;
-        }
-        
-        // Ensure draggable elements are correctly marked
-        function updateDraggableElements() {
-            const previews = imagePreviewsContainer.querySelectorAll('.image-preview');
-            previews.forEach(preview => {
-                makeDraggable(preview);
+                    const title = document.createElement("div");
+                    title.textContent = note.title;
+                    noteLi.appendChild(title);
+
+                    const category = document.createElement("span");
+                    category.classList.add("category-tag", `category-${note.category}`);
+                    category.textContent = note.category.charAt(0).toUpperCase() + note.category.slice(1);
+                    noteLi.appendChild(category);
+
+                    const preview = document.createElement("div");
+                    preview.className = "note-preview";
+                    preview.textContent = note.content;
+                    noteLi.appendChild(preview);
+
+                    notesUl.appendChild(noteLi);
+                }
             });
         }
 
-        // Call updateDraggableElements initially and whenever the DOM changes
-        updateDraggableElements();
+        function changeTextColor() {
+            const color = document.getElementById('color-picker').value;
+            document.execCommand('foreColor', false, color);
+        }
     </script>
 </body>
 </html>
