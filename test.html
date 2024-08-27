@@ -647,12 +647,34 @@
             searchBar.style.display = 'none';
         }
 
-        function showNoteDetail(noteData) {
-    detailTitle.value = noteData.title;
-    detailContent.value = noteData.content;
-    noteDetail.style.display = 'block';
-    notesListView.style.display = 'none';
-}
+        function showNoteDetail(noteId, noteData) {
+            detailTitle.textContent = noteData.title;
+            detailContent.innerHTML = noteData.content.replace(/\n/g, '<br>');
+            detailContent.innerHTML += '<br>';  // Add a line break for separation
+
+            if (noteData.files) {
+                noteData.files.forEach(file => {
+                    const fileTag = document.createElement('div');
+                    if (file.content.startsWith('data:image')) {
+                        const img = document.createElement('img');
+                        img.src = file.content;
+                        img.alt = file.name;
+                        fileTag.appendChild(img);
+                    } else if (file.content.startsWith('data:video')) {
+                        fileTag.textContent = '[Video]';
+                    } else {
+                        fileTag.textContent = '[File]';
+                    }
+                    detailContent.appendChild(fileTag);
+                });
+            }
+
+            noteDetail.dataset.noteId = noteId;
+            noteEditor.style.display = 'none';
+            notesListView.style.display = 'none';
+            noteDetail.style.display = 'block';
+            searchBar.style.display = 'none';
+        }
 
         function deleteNote() {
             const noteId = noteDetail.dataset.noteId;
