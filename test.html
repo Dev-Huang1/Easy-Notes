@@ -277,11 +277,38 @@
         }
 
         #note-detail {
-            display: none;
-            padding: 20px;
-            background-color: white;
-            height: 100%;
-        }
+    display: none;
+    padding: 20px;
+    background-color: white;
+    height: 100%;
+
+
+            #detail-title {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 0;
+    background: none;
+    border-radius: 12px;
+    font-size: 36px;
+    font-weight: bold;
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+
+#detail-content {
+    width: 100%;
+    height: 400px;
+    padding: 10px;
+    border: none;
+    background: none;
+    border-radius: 12px;
+    font-size: 20px;
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+
+            
 
         #note-detail h2 {
             margin-top: 0;
@@ -403,14 +430,14 @@
         <button class="cancel">Cancel</button>
     </div>
     <div id="note-detail">
-        <h2 id="detail-title"></h2>
-        <div id="detail-content"></div>
-        <div class="note-actions">
-            <button id="edit-note">Edit</button>
-            <button id="delete-note">Delete</button>
-            <button id="back-to-list">Back to List</button>
-        </div>
+    <input type="text" id="detail-title" placeholder="Note Title" readonly>
+    <textarea id="detail-content" placeholder="Text here..." readonly></textarea>
+    <div class="note-actions">
+        <button id="edit-note">Edit</button>
+        <button id="delete-note">Delete</button>
+        <button id="back-to-list">Back to List</button>
     </div>
+</div>
     <div id="cookie-consent"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
         <div
@@ -620,34 +647,12 @@
             searchBar.style.display = 'none';
         }
 
-        function showNoteDetail(noteId, noteData) {
-            detailTitle.textContent = noteData.title;
-            detailContent.innerHTML = noteData.content.replace(/\n/g, '<br>');
-            detailContent.innerHTML += '<br>';  // Add a line break for separation
-
-            if (noteData.files) {
-                noteData.files.forEach(file => {
-                    const fileTag = document.createElement('div');
-                    if (file.content.startsWith('data:image')) {
-                        const img = document.createElement('img');
-                        img.src = file.content;
-                        img.alt = file.name;
-                        fileTag.appendChild(img);
-                    } else if (file.content.startsWith('data:video')) {
-                        fileTag.textContent = '[Video]';
-                    } else {
-                        fileTag.textContent = '[File]';
-                    }
-                    detailContent.appendChild(fileTag);
-                });
-            }
-
-            noteDetail.dataset.noteId = noteId;
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'none';
-            noteDetail.style.display = 'block';
-            searchBar.style.display = 'none';
-        }
+        function showNoteDetail(noteData) {
+    detailTitle.value = noteData.title;
+    detailContent.value = noteData.content;
+    noteDetail.style.display = 'block';
+    notesListView.style.display = 'none';
+}
 
         function deleteNote() {
             const noteId = noteDetail.dataset.noteId;
