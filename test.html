@@ -277,38 +277,11 @@
         }
 
         #note-detail {
-    display: none;
-    padding: 20px;
-    background-color: white;
-    height: 100%;
-
-
-            #detail-title {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 0;
-    background: none;
-    border-radius: 12px;
-    font-size: 36px;
-    font-weight: bold;
-    font-family: sans-serif;
-    box-sizing: border-box;
-}
-
-#detail-content {
-    width: 100%;
-    height: 400px;
-    padding: 10px;
-    border: none;
-    background: none;
-    border-radius: 12px;
-    font-size: 20px;
-    font-family: sans-serif;
-    box-sizing: border-box;
-}
-
-            
+            display: none;
+            padding: 20px;
+            background-color: white;
+            height: 100%;
+        }
 
         #note-detail h2 {
             margin-top: 0;
@@ -430,14 +403,14 @@
         <button class="cancel">Cancel</button>
     </div>
     <div id="note-detail">
-    <input type="text" id="detail-title" placeholder="Note Title" readonly>
-    <textarea id="detail-content" placeholder="Text here..." readonly></textarea>
-    <div class="note-actions">
-        <button id="edit-note">Edit</button>
-        <button id="delete-note">Delete</button>
-        <button id="back-to-list">Back to List</button>
+        <h2 id="detail-title"></h2>
+        <div id="detail-content"></div>
+        <div class="note-actions">
+            <button id="edit-note">Edit</button>
+            <button id="delete-note">Delete</button>
+            <button id="back-to-list">Back to List</button>
+        </div>
     </div>
-</div>
     <div id="cookie-consent"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
         <div
