@@ -459,18 +459,22 @@
 
 
         function loadNotes() {
-            const cookies = document.cookie.split(';');
-            cookies.forEach(cookie => {
-                const [name, value] = cookie.split('=');
-                if (name.trim().startsWith('note_')) {
-                    const noteData = JSON.parse(decodeURIComponent(value));
-                    if (!noteData.lastModified) {
-                        noteData.lastModified = new Date().toISOString(); // 设置默认值
-                    }
-                    const li = createNoteListItem(noteData, name.trim());
-                    notesList.appendChild(li);
-                }
-            });
+    createWelcomeNote();
+
+    const cookies = document.cookie.split(';');
+    cookies.forEach(cookie => {
+        const [name, value] = cookie.split('=');
+        if (name.trim().startsWith('note_')) {
+            const noteData = JSON.parse(decodeURIComponent(value));
+            if (!noteData.lastModified) {
+                noteData.lastModified = new Date().toISOString(); // 设置默认值
+            }
+            const li = createNoteListItem(noteData, name.trim());
+            notesList.appendChild(li);
+        }
+    });
+        }
+        
         
         searchIcon.addEventListener('click', () => {
             if (searchBar.style.display) {
