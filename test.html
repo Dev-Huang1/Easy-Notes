@@ -439,27 +439,37 @@
         });
 
         function createWelcomeNote() {
-    const isWelcomeNoteCreated = document.cookie.includes('note_welcome'); // 检查是否已经创建了欢迎文章
+    const cookies = document.cookie.split(';');
 
-    if (!isWelcomeNoteCreated) {
+    let welcomeNoteExists = false;
+    cookies.forEach(cookie => {
+        const [name, value] = cookie.split('=');
+        if (name.trim().startsWith('note_')) {
+            const noteData = JSON.parse(decodeURIComponent(value));
+            if (noteData.title === "Welcome to Easy Note") {
+                welcomeNoteExists = true;
+            }
+        }
+    });
+
+    if (!welcomeNoteExists) {
         const welcomeNote = {
             title: "Welcome to Easy Note",
             content: "Hello! Welcome to use Easy Note",
-            category: "Personal", // 可根据需要设置类别
+            category: "Personal",
             lastModified: new Date().toISOString()
         };
 
         const noteId = 'note_welcome';
-        document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(welcomeNote))}; path=/; max-age=31536000`; // 保存文章并设置cookie有效期为一年
+        document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(welcomeNote))}; path=/; max-age=31536000`;
 
         const li = createNoteListItem(welcomeNote, noteId);
         notesList.appendChild(li);
     }
-}
-
-
+        }
+        
         function loadNotes() {
-    createWelcomeNote();
+    createWelcomeNote(); // 确保加载文章时创建欢迎文章
 
     const cookies = document.cookie.split(';');
     cookies.forEach(cookie => {
@@ -473,7 +483,8 @@
             notesList.appendChild(li);
         }
     });
-        }
+}
+
         
         
         searchIcon.addEventListener('click', () => {
