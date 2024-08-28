@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Notes | Your private notes</title>
+    <title>Easy Notes | Your Private Notes</title>
     <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
@@ -168,28 +168,6 @@
             }
         }
 
-        .detail-actions {
-            margin-top: 10px;
-        }
-        .detail-actions button {
-            margin-right: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #0066ff;
-            color: white;
-            border: none;
-            border-radius: 20px;
-        }
-        .detail-actions #detail-back {
-            background-color: gray;
-        }
-        @media (max-width: 768px) {
-            .detail-actions button {
-                width: 100%;
-                margin: 5px 0 0 0;
-            }
-        }
-
         #delete-confirm {
             position: fixed;
             top: 50%;
@@ -284,28 +262,10 @@
             /* Light yellow for Learn */
         }
 
-
         .note-preview {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        #note-detail {
-            box-sizing: border-box;
-            display: none;
-            position: fixed;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0, 102, 255, 0.1);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        #note-detail h2 {
-            margin-top: 0;
         }
 
         img {
@@ -417,15 +377,6 @@
             <!-- <button id="save-note-btn">Save</button> -->
         </div>
     </div>
-    <div id="note-detail">
-        <h2 id="detail-title"></h2>
-        <div id="detail-content"></div>
-        <div class="detail-actions">
-            <button id="detail-edit">Edit</button>
-            <button id="detail-delete">Delete</button>
-            <button id="detail-back">Back</button>
-        </div>
-    </div>
     <div id="delete-confirm">
         <p>Are you sure you want to delete this note?</p>
         <button id="confirm-delete">Delete</button>
@@ -463,13 +414,6 @@
         const editorContent = document.getElementById('editor-content');
         const editorTitle = document.getElementById('editor-title');
         const editorFileInput = document.getElementById('editor-file-input');
-
-        const noteDetail = document.getElementById('note-detail');
-        const detailTitle = document.getElementById('detail-title');
-        const detailContent = document.getElementById('detail-content');
-        const detailEditBtn = document.getElementById('detail-edit');
-        const deleteNoteBtn = document.getElementById('detail-delete');
-        const detailBackBtn = document.getElementById('detail-back');
         
         searchBar.addEventListener('input', () => {
             const searchTerm = searchBar.value.toLowerCase();
@@ -538,7 +482,7 @@
 
             li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${formattedTime} ${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
             li.addEventListener('click', () => {
-                showNoteDetail(noteId, noteData);
+                showNoteEditor(noteId, noteData);
             });
             return li;
         }
@@ -637,7 +581,6 @@
         function showNotesList() {
             noteEditor.style.display = 'none';
             notesListView.style.display = 'block';
-            noteDetail.style.display = 'none';
             searchBar.style.display = '';
         }
 
@@ -648,41 +591,11 @@
             editorCategory.value = noteData?.category || '';
             noteEditor.style.display = 'block';
             notesListView.style.display = 'none';
-            noteDetail.style.display = 'none';
-            searchBar.style.display = 'none';
-        }
-
-        function showNoteDetail(noteId, noteData) {
-            detailTitle.textContent = noteData.title;
-            detailContent.innerHTML = noteData.content.replace(/\n/g, '<br>');
-            detailContent.innerHTML += '<br>';  // Add a line break for separation
-
-            if (noteData.files) {
-                noteData.files.forEach(file => {
-                    const fileTag = document.createElement('div');
-                    if (file.content.startsWith('data:image')) {
-                        const img = document.createElement('img');
-                        img.src = file.content;
-                        img.alt = file.name;
-                        fileTag.appendChild(img);
-                    } else if (file.content.startsWith('data:video')) {
-                        fileTag.textContent = '[Video]';
-                    } else {
-                        fileTag.textContent = '[File]';
-                    }
-                    detailContent.appendChild(fileTag);
-                });
-            }
-
-            noteDetail.dataset.noteId = noteId;
-            noteEditor.style.display = 'none';
-            notesListView.style.display = 'none';
-            noteDetail.style.display = 'block';
             searchBar.style.display = 'none';
         }
 
         function deleteNote() {
-            const noteId = noteDetail.dataset.noteId;
+            const noteId = editorTitle.dataset.noteId;
             document.cookie = `${noteId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
             const noteLi = notesList.querySelector(`li[data-note-id="${noteId}"]`);
             if (noteLi) {
@@ -700,26 +613,10 @@
             saveNote();
             showNotesList();
         });
-        detailEditBtn.addEventListener('click', () => {
-            const noteId = noteDetail.dataset.noteId;
-            const cookies = document.cookie.split(';');
-            let noteData = null;
-            cookies.forEach(cookie => {
-                const [name, value] = cookie.split('=');
-                if (name.trim() === noteId) {
-                    noteData = JSON.parse(decodeURIComponent(value));
-                }
-            });
-            showNoteEditor(noteId, noteData);
-        });
-        deleteNoteBtn.addEventListener('click', () => {
-            document.getElementById('delete-confirm').style.display = 'block';
-        });
         document.getElementById('confirm-delete').addEventListener('click', deleteNote);
         document.querySelector('#delete-confirm .cancel').addEventListener('click', () => {
             document.getElementById('delete-confirm').style.display = 'none';
         });
-        detailBackBtn.addEventListener('click', showNotesList);
 
         loadNotes();
 
