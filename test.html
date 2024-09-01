@@ -473,63 +473,65 @@ function decrypt(content) {
             }
         });
 
-
-
         function createNoteListItem(noteData, noteId) {
-            const li = document.createElement('li');
-            li.dataset.noteId = noteId;
-            const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
-            const categoryTag = noteData.category ? `<span class="category-tag ${categoryClass}">${noteData.category}</span>` : '';
+    const li = document.createElement('li');
+    li.dataset.noteId = noteId;
+    const categoryClass = noteData.category ? `category-${noteData.category.toLowerCase()}` : '';
+    const categoryTag = noteData.category ? `<span class="category-tag ${categoryClass}">${noteData.category}</span>` : '';
 
-            let fileTypeTags = '';
-            if (noteData.files && noteData.files.length > 0) {
-                const hasImage = noteData.files.some(file => file.content.startsWith('data:image'));
-                const hasVideo = noteData.files.some(file => file.content.startsWith('data:video'));
-                const hasOtherFile = noteData.files.some(file => !file.content.startsWith('data:image') && !file.content.startsWith('data:video'));
+    let fileTypeTags = '';
+    if (noteData.files && noteData.files.length > 0) {
+        const hasImage = noteData.files.some(file => file.content.startsWith('data:image'));
+        const hasVideo = noteData.files.some(file => file.content.startsWith('data:video'));
+        const hasOtherFile = noteData.files.some(file => !file.content.startsWith('data:image') && !file.content.startsWith('data:video'));
 
-                if (hasImage) {
-                    fileTypeTags += '[Image] ';
-                }
-                if (hasVideo) {
-                    fileTypeTags += '[Video] ';
-                }
-                if (hasOtherFile) {
-                    fileTypeTags += '[File] ';
-                }
-            }
+        if (hasImage) {
+            fileTypeTags += '[Image] ';
+        }
+        if (hasVideo) {
+            fileTypeTags += '[Video] ';
+        }
+        if (hasOtherFile) {
+            fileTypeTags += '[File] ';
+        }
+    }
 
-            const formattedTime = formatTime(noteData.lastModified);
+    const formattedTime = formatTime(noteData.lastModified);
 
-            li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag} <div class="note-preview">${formattedTime} ${noteData.content.substring(0, 50)} ${fileTypeTags}</div>`;
-            li.addEventListener('click', () => {
-                showNoteEditor(noteId, noteData);
-            });
-            return li;
+    li.innerHTML = `<strong>${noteData.title}</strong> ${categoryTag}<br><span class="note-preview">${noteData.content}</span><br><small>${fileTypeTags}${formattedTime}</small>`;
+    li.addEventListener('click', () => openNoteEditor(noteId, noteData));
+
+    return li;
         }
 
         function saveNote() {
-            const noteData = {
-                title: editorTitle.value,
-                content: editorContent.value,
-                category: editorCategory.value,
-                files: [],
-                lastModified: new Date().toISOString()  // 记录最后修改时间
-            };
+    const title = editorTitle.value.trim();
+    const content = editorContent.value.trim();
+    const category = editorCategory.value;
+    const noteId = `note_${new Date().getTime()}`;
+    const files = []; // 假设你已经处理了上传的文件
 
-            if (!noteData.title && !noteData.content) return;  /////////
+    if (title || content) {
+        const noteData = {
+            title: title,
+            content: content,
+            category: category,
+            files: files,
+            lastModified: new Date().toISOString()
+        };
 
-            const noteId = editorTitle.dataset.noteId || `note_${Date.now()}`;
+        const encryptedData = encrypt(JSON.stringify(noteData));
+        document.cookie = `${noteId}=${encodeURIComponent(encryptedData)}; path=/;`;
 
-            const previewImages = imagePreviewsContainer.querySelectorAll('img');
-            previewImages.forEach(img => {
-                noteData.files.push({
-                    name: img.alt,
-                    content: img.src
-                });
-            });
+        const li = createNoteListItem(noteData, noteId);
+        notesList.appendChild(li);
 
-            saveNoteToCookies(noteId, noteData);
-        }
+        // 清空编辑器
+        editorTitle.value = '';
+        editorContent.value = '';
+        editorCategory.value = '';
+    }
+                        }
 
         function formatTime(isoString) {
             const date = new Date(isoString);
