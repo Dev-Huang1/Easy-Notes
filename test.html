@@ -438,54 +438,21 @@
             });
         });
 
-        function createWelcomeNote() {
-    const cookies = document.cookie.split(';');
-
-    let welcomeNoteExists = false;
-    cookies.forEach(cookie => {
-        const [name, value] = cookie.split('=');
-        if (name.trim().startsWith('note_')) {
-            const noteData = JSON.parse(decodeURIComponent(value));
-            if (noteData.title === "Welcome to Easy Note") {
-                welcomeNoteExists = true;
-            }
-        }
-    });
-
-    if (!welcomeNoteExists) {
-        const welcomeNote = {
-            title: "Welcome to Easy Note",
-            content: "Hello! Welcome to use Easy Note",
-            category: "Personal",
-            lastModified: new Date().toISOString()
-        };
-
-        const noteId = 'note_welcome';
-        document.cookie = `${noteId}=${encodeURIComponent(JSON.stringify(welcomeNote))}; path=/; max-age=31536000`;
-
-        const li = createNoteListItem(welcomeNote, noteId);
-        notesList.appendChild(li);
-    }
-        }
-        
         function loadNotes() {
-    createWelcomeNote();
-
-    const cookies = document.cookie.split(';');
-    cookies.forEach(cookie => {
-        const [name, value] = cookie.split('=');
-        if (name.trim().startsWith('note_')) {
-            const noteData = JSON.parse(decodeURIComponent(value));
-            if (!noteData.lastModified) {
-                noteData.lastModified = new Date().toISOString(); // 设置默认值
-            }
-            const li = createNoteListItem(noteData, name.trim());
-            notesList.appendChild(li);
+            const cookies = document.cookie.split(';');
+            cookies.forEach(cookie => {
+                const [name, value] = cookie.split('=');
+                if (name.trim().startsWith('note_')) {
+                    const noteData = JSON.parse(decodeURIComponent(value));
+                    if (!noteData.lastModified) {
+                        noteData.lastModified = new Date().toISOString(); // 设置默认值
+                    }
+                    const li = createNoteListItem(noteData, name.trim());
+                    notesList.appendChild(li);
+                }
+            });
         }
-    });
-}
 
-        
         
         searchIcon.addEventListener('click', () => {
             if (searchBar.style.display) {
@@ -494,6 +461,8 @@
                 searchBar.style.display = 'block';
             }
         });
+
+
 
         function createNoteListItem(noteData, noteId) {
             const li = document.createElement('li');
